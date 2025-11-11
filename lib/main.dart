@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:muslim_proj/Constants.dart';
 import 'package:muslim_proj/Widgets/DashboardWidget.dart';
+import 'package:flutter_localizations/flutter_localizations.dart';
+
 
 void main() {
   runApp(const MyApp());
@@ -18,6 +20,19 @@ class MyApp extends StatelessWidget {
       theme: ThemeData(
 
       ),
+      // 🌍 Support des langues
+      supportedLocales: const [
+        Locale('en'),
+        Locale('fr'),
+      ],
+
+      localizationsDelegates: const [
+        GlobalMaterialLocalizations.delegate,
+        GlobalWidgetsLocalizations.delegate,
+        GlobalCupertinoLocalizations.delegate,
+      ],
+
+      locale: const Locale('fr'), // ✅ Force la langue française
       home: const DashboardWidget(),
     );
   }

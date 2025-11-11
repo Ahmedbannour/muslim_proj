@@ -266,8 +266,22 @@ class _TaskDetailsState extends State<TaskDetails> {
                       Expanded(
                         child: DateTimeInput(
                             label: "Commence",
+                            begin: DateTime.now(),
+                            end: selectedDateTimeEnd ?? DateTime(2030),
+                            fieldHintText: "Date Commence",
+                            helpText: "Date Commence",
+                            currentDate: selectedDateTimeEnd ?? DateTime.now(),
+                            fieldLabelText: "Date Commence",
+                            errorInvalidText: "Date Commence invalid",
+                            errorFormatText: "Date Commence format invalid",
+                            confirmText: "enregistrer",
+                            cancelText: "annuler",
+                            barrierLabel: "Date Commence",
                             updateDate: (newDate){
-                              selectedDateTimeBegin = newDate;
+                              setState(() {
+                                selectedDateTimeBegin = newDate;
+                              });
+                              print('selectedDateTimeBegin : $selectedDateTimeBegin');
                             }
                         )
                       ),
@@ -278,8 +292,22 @@ class _TaskDetailsState extends State<TaskDetails> {
                       Expanded(
                         child: DateTimeInput(
                             label: "Fin",
+                            begin: selectedDateTimeBegin ?? DateTime.now(),
+                            end: DateTime(2030),
+                            fieldHintText: "Date Fin",
+                            helpText: "Date Fin",
+                            currentDate: selectedDateTimeBegin ?? DateTime.now(),
+                            fieldLabelText: "Date Fin",
+                            errorInvalidText: "Date Fin invalid",
+                            errorFormatText: "Date Fin format invalid",
+                            confirmText: "enregistrer",
+                            cancelText: "annuler",
+                            barrierLabel: "Date Fin",
                             updateDate: (newDate){
-                              selectedDateTimeEnd = newDate;
+                              setState(() {
+                                selectedDateTimeEnd = newDate;
+                              });
+                              print('selectedDateTimeEnd : $selectedDateTimeEnd');
                             }
                         ),
                       ),

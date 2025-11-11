@@ -318,7 +318,7 @@ class _CalendarWidgetState extends State<CalendarWidget> {
             },
             calendarFormat: calendarFormat,
             formatAnimationCurve: Curves.easeIn,
-            loadEventsForDisabledDays: true,
+
 
             onPageChanged: (e){
               print('fsdfsd : $e');

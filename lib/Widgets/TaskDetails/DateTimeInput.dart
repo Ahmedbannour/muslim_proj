@@ -6,7 +6,33 @@ import 'package:muslim_proj/Constants.dart';
 class DateTimeInput extends StatefulWidget {
   final String label;
   final Function(DateTime? olddate) updateDate;
-  const DateTimeInput({super.key , required this.label, required this.updateDate});
+  final DateTime? begin;
+  final DateTime? end;
+  final String? barrierLabel;
+  final String? cancelText;
+  final String? confirmText;
+  final String? errorFormatText;
+  final String? errorInvalidText;
+  final String? fieldLabelText;
+  final DateTime? currentDate;
+  final String? helpText;
+  final String? fieldHintText;
+  const DateTimeInput({
+    super.key ,
+    required this.label,
+    required this.updateDate ,
+    required this.begin ,
+    required this.end,
+    required this.barrierLabel,
+    required this.cancelText,
+    required this.confirmText,
+    required this.currentDate,
+    required this.errorFormatText,
+    required this.errorInvalidText,
+    required this.fieldHintText,
+    required this.fieldLabelText,
+    required this.helpText,
+  });
 
   @override
   State<DateTimeInput> createState() => _DateTimeInputState();
@@ -17,6 +43,18 @@ class _DateTimeInputState extends State<DateTimeInput> {
   
   late String label;
   DateTime? selectedDateTime;
+  DateTime? begin;
+  DateTime? end;
+  String? barrierLabel;
+  String? cancelText;
+  String? confirmText;
+  String? errorFormatText;
+  String? errorInvalidText;
+  String? fieldLabelText;
+  DateTime? currentDate;
+  String? helpText;
+  String? fieldHintText;
+
 
   @override
   void initState() {
@@ -24,6 +62,20 @@ class _DateTimeInputState extends State<DateTimeInput> {
     super.initState();
     
     label = widget.label;
+    begin = widget.begin;
+    end = widget.end;
+    barrierLabel = widget.barrierLabel;
+    cancelText = widget.cancelText;
+    confirmText = widget.confirmText;
+    errorFormatText = widget.errorFormatText;
+    errorInvalidText = widget.errorInvalidText;
+    fieldLabelText = widget.fieldLabelText;
+    currentDate = widget.currentDate;
+    helpText = widget.helpText;
+    fieldHintText = widget.fieldHintText;
+
+    print('begin : $begin');
+    print('end : $end');
   }
   
   
@@ -32,19 +84,64 @@ class _DateTimeInputState extends State<DateTimeInput> {
     // TODO: implement didUpdateWidget
     super.didUpdateWidget(oldWidget);
     
-    if(widget.label != label){
+    if(label != widget.label){
       label = widget.label;
     }
+    if(begin != widget.begin){
+      begin = widget.begin;
+    }
+
+
+    if(end != widget.end){
+      end = widget.end;
+    }
+
+    if(barrierLabel != widget.barrierLabel){
+      barrierLabel = widget.barrierLabel;
+    }
+
+    if(cancelText != widget.cancelText){
+      cancelText = widget.cancelText;
+    }
+
+    if(confirmText != widget.confirmText){
+      confirmText = widget.confirmText;
+    }
+
+    if(errorFormatText != widget.errorFormatText){
+      errorFormatText = widget.errorFormatText;
+    }
+
+    if(errorInvalidText != widget.errorInvalidText){
+      errorInvalidText = widget.errorInvalidText;
+    }
+
+    if(fieldLabelText != widget.fieldLabelText){
+      fieldLabelText = widget.fieldLabelText;
+    }
+
+    if(currentDate != widget.currentDate){
+      currentDate = widget.currentDate;
+    }
+
+    if(helpText != widget.helpText){
+      helpText = widget.helpText;
+    }
+
+    if(fieldHintText != widget.fieldHintText){
+      fieldHintText = widget.fieldHintText;
+    }
+
+
   }
   
   
   @override
   Widget build(BuildContext context) {
 
-    final formattedDate = selectedDateTime != null  ? DateFormat('dd MMM, hh:mm a').format(selectedDateTime!) : "Select date & time";
+    final formattedDate = selectedDateTime != null  ? DateFormat('dd/MM/yyyy-HH:mm').format(selectedDateTime!) : fieldLabelText ?? "Select date & time";
 
-    
-    
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -86,14 +183,27 @@ class _DateTimeInputState extends State<DateTimeInput> {
     // 1️⃣ Sélection de la date
     final DateTime? date = await showDatePicker(
       context: context,
-      initialDate: selectedDateTime ?? DateTime.now(),
-      firstDate: DateTime(2020),
-      lastDate: DateTime(2030),
+      initialDate: selectedDateTime  ?? begin ?? end ??  DateTime.now(),
+      firstDate: begin ?? DateTime(2020),
+      lastDate: end ?? DateTime(2030),
+      barrierColor: KPrimaryColor.withOpacity(.2),
+      barrierDismissible: true,
+      initialDatePickerMode: DatePickerMode.day,
+      barrierLabel: barrierLabel,
+      cancelText: cancelText,
+      confirmText: confirmText,
+      errorFormatText: errorFormatText,
+      errorInvalidText: errorInvalidText,
+      fieldLabelText: fieldLabelText,
+      currentDate: currentDate,
+      helpText: helpText,
+      fieldHintText: fieldHintText,
+      locale: const Locale('fr', 'FR'),
       builder: (context, child) {
         return Theme(
           data: Theme.of(context).copyWith(
             colorScheme: ColorScheme.light(
-              primary: Colors.deepOrange,
+              primary: KPrimaryColor,
               onPrimary: Colors.white,
               onSurface: Colors.black87,
             ),
@@ -132,10 +242,8 @@ class _DateTimeInputState extends State<DateTimeInput> {
       time.minute,
     );
 
-    setState(() {
-      selectedDateTime = newDateTime;
-    });
-    
+    selectedDateTime = newDateTime;
+
     widget.updateDate(selectedDateTime);
   }
 
