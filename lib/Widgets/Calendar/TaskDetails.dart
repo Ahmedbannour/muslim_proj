@@ -8,6 +8,7 @@ import 'package:geocoding/geocoding.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:intl/intl.dart';
 import 'package:muslim_proj/Constants.dart';
+import 'package:muslim_proj/Widgets/AddParticipantWidget.dart';
 import 'package:muslim_proj/Widgets/Calendar/MapSelectionScreen.dart';
 import 'package:muslim_proj/Widgets/TaskDetails/DateTimeInput.dart';
 
@@ -560,6 +561,7 @@ class _TaskDetailsState extends State<TaskDetails> {
                                   return GestureDetector(
                                     onTap: (){
                                       print('add participant');
+                                      Navigator.push(context, MaterialPageRoute(builder: (context) => AddParticipantWidget()));
                                     },
                                     child: Padding(
                                       padding: const EdgeInsets.all(4.0),
