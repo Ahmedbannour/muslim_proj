@@ -160,6 +160,7 @@ class _DateTimeInputState extends State<DateTimeInput> {
             width: double.infinity,
             padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 16),
             decoration: BoxDecoration(
+              color: Colors.white,
               border: Border.all(color: Colors.grey.shade300),
               borderRadius: BorderRadius.circular(8),
             ),
@@ -167,9 +168,7 @@ class _DateTimeInputState extends State<DateTimeInput> {
               formattedDate,
               style: TextStyle(
                 fontSize: 16,
-                color: selectedDateTime != null
-                    ? Colors.black87
-                    : Colors.grey.shade500,
+                color: selectedDateTime != null ? Colors.black87 : Colors.grey.shade500,
               ),
             ),
           ),
@@ -219,6 +218,12 @@ class _DateTimeInputState extends State<DateTimeInput> {
     final TimeOfDay? time = await showTimePicker(
       context: context,
       initialTime: TimeOfDay.fromDateTime(selectedDateTime ?? DateTime.now()),
+      barrierLabel: barrierLabel,
+      cancelText: cancelText,
+      confirmText: confirmText,
+      errorInvalidText: errorInvalidText,
+      barrierColor: KPrimaryColor.withOpacity(.2),
+      helpText: helpText,
       builder: (context, child) {
         return Theme(
           data: Theme.of(context).copyWith(

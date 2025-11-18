@@ -7,12 +7,16 @@
 
     <uses-permission android:name="android.permission.ACCESS_BACKGROUND_LOCATION" />
 
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE_LOCATION" />
 
 
     <application
         android:label="muslim_proj"
         android:name="${applicationName}"
         android:icon="@mipmap/ic_launcher">
+
+        <meta-data android:name="com.google.android.geo.API_KEY" android:value="AIzaSyDvofX_RxuFLdYF-ZM1tHOHce5vWMJ7TWM"/>
+
         <activity
             android:name=".MainActivity"
             android:exported="true"

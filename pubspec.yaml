@@ -67,6 +67,13 @@ dependencies:
 
   flutter_multi_select_items: ^0.4.3
 
+  google_maps_flutter: ^2.5.0
+  geolocator: ^11.0.0
+  geocoding: ^3.0.0
+
+  dropdown_button2: ^2.3.9
+
+
 dev_dependencies:
   flutter_test:
     sdk: flutter
