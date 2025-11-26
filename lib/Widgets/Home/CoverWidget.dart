@@ -199,7 +199,7 @@ class _CoverWidgetState extends State<CoverWidget> {
                     children: [
                       Container(
                         child: Text(
-                            "2 Juin 2025",
+                            getDate(),
                             style: GoogleFonts.rubik(
 
                             )
@@ -233,5 +233,9 @@ class _CoverWidgetState extends State<CoverWidget> {
 
   String getMinutes() => _currentTime.minute.toString().padLeft(2, '0');
 
+
+  String getDate() =>DateFormat('d MMM yyyy', 'fr_FR').format(_currentTime);
+
   String getActualTime() => DateFormat.Hm().format(_currentTime);
+
 }

@@ -19,50 +19,7 @@ class PrayerWidget extends StatefulWidget {
 class _PrayerWidgetState extends State<PrayerWidget> {
 
 
-
-
-
-  List<Map<String, dynamic>> prayers = [
-    {
-      "label" : "Fajer",
-      "time" : "05:36",
-      "icon" : "cloud-sun"
-    },
-    {
-      "label" : "Dhuhr",
-      "time" : "12:25",
-      "icon" : "brightness"
-    },
-    {
-      "label" : "Asr",
-      "time" : "16:32",
-      "icon" : "cloud-sun"
-    },
-    {
-      "label" : "Magrib",
-      "time" : "18:36",
-      "icon" : "moon"
-    },
-    {
-      "label" : "Fajer",
-      "time" : "19:42",
-      "icon" : "moon-stars"
-    },
-  ];
-
-
-
   late Future<List<Map<String,dynamic>>> prayersInfo = getPrayersInfo();
-
-
-
-
-  Future<List<Map<String,dynamic>>>  getPrayersInfo() async{
-    final location = await getCurrentLocation();
-
-
-    return await Provider.of<PrayersInfoService>(context , listen: false).getPrayerInfos(DateTime.now() , LatLng(location.latitude, location.longitude));
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -87,60 +44,73 @@ class _PrayerWidgetState extends State<PrayerWidget> {
             Expanded(
               child: FutureBuilder(
                   future: prayersInfo,
-                  builder: (context , snapshat){
-                    return ListView.builder(
-                      itemCount: prayers.length,
-                      scrollDirection: Axis.horizontal,
-                      itemBuilder: (context , index){
-                        return Padding(
-                          padding: const EdgeInsets.all(8.0),
-                          child: Container(
-                            decoration: BoxDecoration(
-                                color: KPrimaryColor.withOpacity(.1),
-                                borderRadius: BorderRadius.circular(8)
-                            ),
-                            clipBehavior: Clip.antiAliasWithSaveLayer,
-                            child: Padding(
-                              padding: const EdgeInsets.all(16.0),
-                              child: Column(
-                                children: [
-                                  SvgPicture.asset(
-                                    'assets/icons/${prayers[index]['icon']}.svg',
-                                    color: Color(0xFFFF7440),
-                                    fit: BoxFit.contain,
-                                    height: 24,
-                                    alignment: Alignment.center,
-                                    clipBehavior: Clip.antiAliasWithSaveLayer,
-                                  ),
-
-                                  SizedBox(height: 8),
-
-                                  Text(
-                                    prayers[index]['label'],
-
-                                    style: TextStyle(
-                                      fontWeight: FontWeight.w400,
+                  builder: (context , snapshot){
+                    if(snapshot.hasData){
+                      dynamic response = snapshot;
+                      List<Map<String,dynamic>> res = response.data.where((elem) => (elem['label'] == "Fajr" || elem['label'] == "Dhuhr" || elem['label'] == "Asr" || elem['label'] == "Maghrib" || elem['label'] == "Isha")).toList();
+                      print('data task : ${res.toString()}');
+                      return ListView.builder(
+                        itemCount: res.length,
+                        scrollDirection: Axis.horizontal,
+                        itemBuilder: (context , index){
+                          return Padding(
+                            padding: const EdgeInsets.all(8.0),
+                            child: Container(
+                              decoration: BoxDecoration(
+                                  color: KPrimaryColor.withOpacity(.1),
+                                  borderRadius: BorderRadius.circular(8)
+                              ),
+                              clipBehavior: Clip.antiAliasWithSaveLayer,
+                              child: Padding(
+                                padding: const EdgeInsets.all(16.0),
+                                child: Column(
+                                  children: [
+                                    SvgPicture.asset(
+                                      'assets/icons/${res[index]['icon']}.svg',
+                                      color: Color(0xFFFF7440),
+                                      fit: BoxFit.contain,
+                                      height: 24,
+                                      alignment: Alignment.center,
+                                      clipBehavior: Clip.antiAliasWithSaveLayer,
                                     ),
-                                  ),
 
+                                    SizedBox(height: 8),
 
-                                  SizedBox(height: 8),
+                                    Text(
+                                      res[index]['label'],
 
-
-                                  Text(
-                                    prayers[index]['time'],
-
-                                    style: TextStyle(
-                                        fontWeight: FontWeight.bold
+                                      style: TextStyle(
+                                        fontWeight: FontWeight.w400,
+                                      ),
                                     ),
-                                  ),
 
-                                ],
+
+                                    SizedBox(height: 8),
+
+
+                                    Text(
+                                      res[index]['time'],
+
+                                      style: TextStyle(
+                                          fontWeight: FontWeight.bold
+                                      ),
+                                    ),
+
+                                  ],
+                                ),
                               ),
                             ),
-                          ),
-                        );
-                      },
+                          );
+                        },
+                      );
+                    }else if(snapshot.hasError){
+                      return Text(
+                        'prayer service error : ${snapshot.error.toString()}'
+                      );
+                    }
+
+                    return Center(
+                      child: CircularProgressIndicator(),
                     );
                   }
               ),
@@ -148,5 +118,14 @@ class _PrayerWidgetState extends State<PrayerWidget> {
           ],
         )
     );
+  }
+
+
+  Future<List<Map<String,dynamic>>>  getPrayersInfo() async{
+    final location = await getCurrentLocation();
+
+
+    print('latitude :${location.latitude} , longitude : ${location.longitude} ');
+    return await Provider.of<PrayersInfoService>(context , listen: false).getPrayerInfos(DateTime.now() , LatLng(location.latitude, location.longitude));
   }
 }

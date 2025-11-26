@@ -4,20 +4,64 @@ import 'package:flutter/material.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:muslim_proj/Services/dio.dart';
 import 'package:dio/dio.dart' as Dio;
+import 'package:intl/intl.dart';
 
 
 class PrayersInfoService extends ChangeNotifier {
 
   Future<List<Map<String,dynamic>>> getPrayerInfos(DateTime date , LatLng location) async {
-    try {
-      final response = await dio().get('/timings/',
-        data: {
+    print('latitudess : ${location.latitude} , longitude : ${location.longitude}');
+    print('datee : ${DateFormat('dd-MM-yyyy', 'fr_FR').format(DateTime.now())}');
 
+    String dateFormatted = DateFormat('dd-MM-yyyy', 'fr_FR').format(date);
+
+
+    try {
+      final response = await dio().get('/timings/$dateFormatted',
+        queryParameters: {
+          "latitude": location.latitude,
+          "longitude": location.longitude,
+          "method": 3,
         },
       );
 
-      print('response : ${response.data} ');
-      var res =response.data;
+      print('response : ${response.data['data']['timings']} ');
+
+      List<Map<String,dynamic>> timings = [];
+
+      if(response.data != null && response.data['data'] != null && response.data['data']['timings'] != null){
+        Map<String,dynamic> tt = response.data['data']['timings'];
+        print('tt : $tt');
+
+        tt.forEach((key , value){
+          print('key : $key');
+          print('value :$value');
+
+          Map<String,dynamic> elem = {
+            "label" : key,
+            "time" : value,
+          };
+
+
+          if(key == "Fajr"){
+            elem['icon'] = "cloud-sun";
+          }else if(key == "Dhuhr"){
+            elem['icon'] = "brightness";
+          }else if(key == "Asr"){
+            elem['icon'] = "cloud-sun";
+          }else if(key == "Maghrib"){
+            elem['icon'] = "moon";
+          }else if(key == "Isha"){
+            elem['icon'] = "moon-stars";
+          }
+          timings.add(elem);
+        });
+
+        return timings;
+      }
+
+
+      var res = response.data;
 
       notifyListeners();
       print('res : ${res}');

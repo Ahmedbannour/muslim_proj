@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:muslim_proj/Constants.dart';
+import 'package:muslim_proj/Services/PrayersInfo.dart';
 import 'package:muslim_proj/Widgets/DashboardWidget.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
+import 'package:provider/provider.dart';
 
 
 void main() {
@@ -14,26 +16,31 @@ class MyApp extends StatelessWidget {
   // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      title: 'Muslim App',
-      debugShowCheckedModeBanner: false,
-      theme: ThemeData(
+    return MultiProvider(
+      providers: [
+        ChangeNotifierProvider(create: (context)=> PrayersInfoService(),),
+      ],
+      child: MaterialApp(
+        title: 'Muslim App',
+        debugShowCheckedModeBanner: false,
+        theme: ThemeData(
 
+        ),
+        // 🌍 Support des langues
+        supportedLocales: const [
+          Locale('en'),
+          Locale('fr'),
+        ],
+
+        localizationsDelegates: const [
+          GlobalMaterialLocalizations.delegate,
+          GlobalWidgetsLocalizations.delegate,
+          GlobalCupertinoLocalizations.delegate,
+        ],
+
+        locale: const Locale('fr'), // ✅ Force la langue française
+        home: const DashboardWidget(),
       ),
-      // 🌍 Support des langues
-      supportedLocales: const [
-        Locale('en'),
-        Locale('fr'),
-      ],
-
-      localizationsDelegates: const [
-        GlobalMaterialLocalizations.delegate,
-        GlobalWidgetsLocalizations.delegate,
-        GlobalCupertinoLocalizations.delegate,
-      ],
-
-      locale: const Locale('fr'), // ✅ Force la langue française
-      home: const DashboardWidget(),
     );
   }
 
