@@ -307,18 +307,5 @@ class QiblaWidget extends StatelessWidget {
     );
   }
 
-  Widget _buildDot(Alignment alignment) {
-    return Align(
-      alignment: alignment,
-      child: Container(
-        margin: const EdgeInsets.all(24),
-        height: 8,
-        width: 8,
-        decoration: BoxDecoration(
-          shape: BoxShape.circle,
-          color: KPrimaryColor,
-        ),
-      ),
-    );
-  }
+
 }

@@ -28,18 +28,7 @@ class _HomeWidgetState extends State<HomeWidget> {
       children: [
         Expanded(
           flex : 2,
-          child: Stack(
-            children: [
-              Positioned(
-                left: 0,
-                right: 0,
-                bottom: 0,
-                top: 0,
-                child: CoverWidget(),
-              ),
-
-            ],
-          ),
+          child: CoverWidget(),
         ),
 
         Expanded(

@@ -50,5 +50,15 @@
 	// to get phone contact access
 	<key>NSContactsUsageDescription</key>
     <string>Reason we need access to the contact list</string>
+
+
+    //image picker
+
+    <key>NSCameraUsageDescription</key>
+    <string>We need access to camera</string>
+    <key>NSPhotoLibraryUsageDescription</key>
+    <string>We need access to photos</string>
+
+    
 </dict>
 </plist>

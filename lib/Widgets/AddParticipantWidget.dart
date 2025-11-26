@@ -1,6 +1,9 @@
+import 'dart:io';
+
 import 'package:dotted_border/dotted_border.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:muslim_proj/Constants.dart';
 import 'package:muslim_proj/Widgets/TaskDetails/DateInput.dart';
 
@@ -20,6 +23,36 @@ class _AddParticipantWidgetState extends State<AddParticipantWidget> {
   final FocusNode nameNode = FocusNode();
   final FocusNode numNode = FocusNode();
 
+  File? _image;
+  final ImagePicker _picker = ImagePicker();
+
+  // Galerie
+  Future<void> pickFromGallery() async {
+    final XFile? pickedImage = await _picker.pickImage(
+      source: ImageSource.gallery,
+      imageQuality: 80,
+    );
+
+    if (pickedImage != null) {
+      setState(() {
+        _image = File(pickedImage.path);
+      });
+    }
+  }
+
+  // Caméra
+  Future<void> pickFromCamera() async {
+    final XFile? pickedImage = await _picker.pickImage(
+      source: ImageSource.camera,
+      imageQuality: 80,
+    );
+
+    if (pickedImage != null) {
+      setState(() {
+        _image = File(pickedImage.path);
+      });
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -127,11 +160,11 @@ class _AddParticipantWidgetState extends State<AddParticipantWidget> {
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
                             GestureDetector(
-                              onTap: (){
-                                print('upload photo');
-
-                              },
-                              child: Container(
+                              onTap: pickFromGallery,
+                              child: _image != null ? ClipRRect(
+                                borderRadius: BorderRadius.circular(16),
+                                child: Image.file(_image!, width: 200, height: 200, fit: BoxFit.cover),
+                              ) : Container(
                                 alignment: Alignment.center,
                                 decoration: BoxDecoration(
                                   color: KPrimaryColor.withOpacity(.2),
@@ -332,20 +365,25 @@ class _AddParticipantWidgetState extends State<AddParticipantWidget> {
                 Row(
                   children: [
                     Expanded(
-                      child: AnimatedContainer(
-                        duration: Duration(milliseconds: 200),
-                        decoration: BoxDecoration(
-                          color: KPrimaryColor,
-                          borderRadius: BorderRadius.circular(16)
-                        ),
-                        child: Padding(
-                          padding: EdgeInsets.all(16),
-                          child: Center(
-                            child: Text(
-                              'Enregistrer',
-                              style: TextStyle(
-                                color: Colors.white,
-                                fontWeight: FontWeight.bold
+                      child: GestureDetector(
+                        onTap: (){
+                          Navigator.pop(context);
+                        },
+                        child: AnimatedContainer(
+                          duration: Duration(milliseconds: 200),
+                          decoration: BoxDecoration(
+                            color: KPrimaryColor,
+                            borderRadius: BorderRadius.circular(16)
+                          ),
+                          child: Padding(
+                            padding: EdgeInsets.all(16),
+                            child: Center(
+                              child: Text(
+                                'Enregistrer',
+                                style: TextStyle(
+                                  color: Colors.white,
+                                  fontWeight: FontWeight.bold
+                                ),
                               ),
                             ),
                           ),
