@@ -356,10 +356,41 @@ class _MushafWidgetState extends State<MushafWidget> {
                       style: GoogleFonts.beVietnamPro(fontWeight: FontWeight.bold, fontSize: 28, color: KPrimaryColor),
                     ),
                     const SizedBox(height: 8),
-                    Text(
-                      surah['englishNameTranslation'] ?? '',
-                      style: GoogleFonts.beVietnamPro(color: Colors.black45, fontWeight: FontWeight.w400),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+
+                        Text(
+                          surah['englishNameTranslation'],
+                          style: GoogleFonts.beVietnamPro(
+                              color: Colors.black45,
+                              fontWeight: FontWeight.w400
+                          ),
+                        ),
+
+                        SizedBox(width: 8),
+
+                        Container(
+                          height: 6,
+                          width: 6,
+                          decoration: BoxDecoration(
+                              color: Color(0xf736000000),
+                              shape: BoxShape.circle
+                          ),
+                        ),
+
+
+                        SizedBox(width: 8),
+                        Text(
+                          "${surah['numberOfAyahs']} Ayahs",
+                          style: GoogleFonts.beVietnamPro(
+                              color: Colors.black45,
+                              fontWeight: FontWeight.w400
+                          ),
+                        )
+                      ],
                     ),
+
                     const SizedBox(height: 12),
                     if (onlyBasmallah.isNotEmpty)
                       Padding(
