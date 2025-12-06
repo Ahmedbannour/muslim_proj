@@ -3,7 +3,7 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:muslim_proj/Services/dio.dart';
-import 'package:dio/dio.dart' as Dio;
+import 'package:dio/dio.dart';
 import 'package:intl/intl.dart';
 
 
@@ -17,7 +17,7 @@ class PrayersInfoService extends ChangeNotifier {
 
 
     try {
-      final response = await dio().get('/timings/$dateFormatted',
+      final response = await Dio().get('http://api.aladhan.com/v1/timings/$dateFormatted',
         queryParameters: {
           "latitude": location.latitude,
           "longitude": location.longitude,
@@ -66,8 +66,8 @@ class PrayersInfoService extends ChangeNotifier {
       notifyListeners();
       print('res : ${res}');
       return res;
-    } on Dio.DioError catch (error) {
-      if (error.type == Dio.DioErrorType && error.error is HandshakeException) {
+    } on DioError catch (error) {
+      if (error.type == DioErrorType && error.error is HandshakeException) {
         // Handle HandshakeException here
 
 
@@ -80,7 +80,7 @@ class PrayersInfoService extends ChangeNotifier {
 
           return [];
         }
-      }else if (error.type == Dio.DioErrorType.receiveTimeout || error.error is SocketException) {
+      }else if (error.type == DioErrorType.receiveTimeout || error.error is SocketException) {
         // Handle the timeout error here
 
 

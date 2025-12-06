@@ -4,7 +4,7 @@ import 'package:hive/hive.dart';
 
 Dio dio(){
 
-  String url = "http://api.aladhan.com";
+  String url = "http://api.alquran.cloud/v1";
 
 
   print('base url : $url');
@@ -25,7 +25,7 @@ Dio dio(){
       return handler.next(e);
     },
   ));
-  dio.options.baseUrl= '$url/v1/';
+  dio.options.baseUrl= '$url/';
   dio.options.headers['accept'] = 'Application/Json';
   return dio;
 }

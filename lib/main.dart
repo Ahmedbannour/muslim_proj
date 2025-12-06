@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:muslim_proj/Constants.dart';
 import 'package:muslim_proj/Services/PrayersInfo.dart';
+import 'package:muslim_proj/Services/QuranService.dart';
 import 'package:muslim_proj/Widgets/DashboardWidget.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:provider/provider.dart';
@@ -19,6 +20,7 @@ class MyApp extends StatelessWidget {
     return MultiProvider(
       providers: [
         ChangeNotifierProvider(create: (context)=> PrayersInfoService(),),
+        ChangeNotifierProvider(create: (context)=> QuranService(),),
       ],
       child: MaterialApp(
         title: 'Muslim App',

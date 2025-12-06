@@ -113,11 +113,38 @@ flutter:
   # "family" key with the font family name, and a "fonts" key with a
   # list giving the asset and other descriptors for the font. For
   # example:
-  # fonts:
-  #   - family: Schyler
-  #     fonts:
-  #       - asset: fonts/Schyler-Regular.ttf
-  #       - asset: fonts/Schyler-Italic.ttf
+  fonts:
+    - family: UthmanicHafs
+      fonts:
+        - asset: assets/fonts/UthmanicHafs_V22.ttf
+
+    - family: Symbols1_Ver20
+      fonts:
+        - asset: assets/fonts/Symbols1_Ver20.ttf
+
+    - family: ShadatainVer01
+      fonts:
+        - asset: assets/fonts/ShadatainVer01.otf
+    - family: BasmalahVer
+      fonts:
+        - asset: assets/fonts/BasmalahVer01.otf
+    - family: Nabi_Quran_Font
+      fonts:
+        - asset: assets/fonts/Nabi_Quran_Font/Nabi.ttf
+
+
+    - family: ArabQuranIslamic140-vnmnZ
+      fonts:
+        - asset: assets/fonts/ArabQuranIslamic140-vnmnZ.ttf
+
+    - family: alfont_com_Quran_Surah_1
+      fonts:
+        - asset: assets/fonts/alfont_com_Quran_Surah_1.ttf
+
+
+    - family: HafsNastaleeq_Ver10
+      fonts:
+        - asset: assets/fonts/HafsNastaleeq_Ver10.otf
   #         style: italic
   #   - family: Trajan Pro
   #     fonts:
