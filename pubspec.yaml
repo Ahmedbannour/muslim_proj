@@ -75,6 +75,11 @@ dependencies:
   dropdown_button2: ^2.3.9
   image_picker: ^1.2.1
 
+  just_audio: ^0.9.36
+  audio_session: ^0.1.13
+  rxdart: ^0.27.7
+
+
 dev_dependencies:
   flutter_test:
     sdk: flutter
