@@ -356,7 +356,7 @@ class _MushafWidgetState extends State<MushafWidget> {
                       if(snapshot.hasError){
                         return Center(child: Text('Error: ${snapshot.error}'));
                       }else if(snapshot.hasData){
-                        return AudioReader(url: "https://cdn.islamic.network/quran/audio/128/ar.ahmedajamy/294.mp3");
+                        return AudioReader(url: "https://cdn.islamic.network/quran/audio-surah/128/ar.alafasy/1.mp3");
                       }
 
                       return Center(
