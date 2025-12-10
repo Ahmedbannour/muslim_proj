@@ -85,7 +85,7 @@ class _DashboardWidgetState extends State<DashboardWidget> {
                   children: [
                     Text(
                       _title,
-                      style: TextStyle(
+                      style: GoogleFonts.beVietnamPro(
                           fontSize: 22,
                           fontWeight: FontWeight.w500
                       ),
@@ -135,7 +135,7 @@ class _DashboardWidgetState extends State<DashboardWidget> {
 
                     Text(
                       _title,
-                      style: TextStyle(
+                      style: GoogleFonts.beVietnamPro(
                         fontSize: 22,
                         fontWeight: FontWeight.bold
                       ),

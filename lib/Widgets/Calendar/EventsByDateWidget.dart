@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
 import 'package:modal_bottom_sheet/modal_bottom_sheet.dart';
 import 'package:muslim_proj/Constants.dart';
@@ -91,7 +92,7 @@ class _EventsByDateWidgetState extends State<EventsByDateWidget> {
 
                           Text(
                             formattedDate(selectedDate),
-                            style: TextStyle(
+                            style: GoogleFonts.beVietnamPro(
                               color: Colors.white,
                               fontWeight: FontWeight.w500
                             ),
@@ -165,11 +166,11 @@ class _EventsByDateWidgetState extends State<EventsByDateWidget> {
                                   borderRadius: BorderRadius.circular(16),
                                 ),
                                 clipBehavior: Clip.antiAliasWithSaveLayer,
-                                child: const Row(
+                                child:  Row(
                                   children: [
                                     Icon(Icons.edit, color: Colors.white),
                                     SizedBox(width: 8),
-                                    Text("Modifier", style: TextStyle(color: Colors.white)),
+                                    Text("Modifier", style: GoogleFonts.beVietnamPro(color: Colors.white)),
                                   ],
                                 ),
                               ),
@@ -180,12 +181,12 @@ class _EventsByDateWidgetState extends State<EventsByDateWidget> {
                                   color: Colors.red.withOpacity(.8),
                                   borderRadius: BorderRadius.circular(16),
                                 ),
-                                child: const Row(
+                                child: Row(
                                   mainAxisAlignment: MainAxisAlignment.end,
                                   children: [
                                     Icon(Icons.delete_outline, color: Colors.white),
                                     SizedBox(width: 8),
-                                    Text("Supprimer", style: TextStyle(color: Colors.white)),
+                                    Text("Supprimer", style: GoogleFonts.beVietnamPro(color: Colors.white)),
                                   ],
                                 ),
                               ),
@@ -227,7 +228,7 @@ class _EventsByDateWidgetState extends State<EventsByDateWidget> {
                                         ),
                                         TextButton(
                                           onPressed: () => Navigator.pop(context, true),
-                                          child: const Text("Supprimer", style: TextStyle(color: Colors.red)),
+                                          child: Text("Supprimer", style: GoogleFonts.beVietnamPro(color: Colors.red)),
                                         ),
                                       ],
                                     ),
@@ -274,10 +275,10 @@ class _EventsByDateWidgetState extends State<EventsByDateWidget> {
                                           padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                                           child: Text(
                                             task['categorie'].toString().toUpperCase(),
-                                            style: const TextStyle(
+                                            style: GoogleFonts.beVietnamPro(
                                               color: Colors.white,
                                               fontSize: 12,
-                                              fontWeight: FontWeight.w500,
+                                              fontWeight: FontWeight.w600,
                                             ),
                                           ),
                                         ),
@@ -307,7 +308,7 @@ class _EventsByDateWidgetState extends State<EventsByDateWidget> {
                                         Expanded(
                                           child: Text(
                                             task['label'],
-                                            style: const TextStyle(
+                                            style: GoogleFonts.beVietnamPro(
                                               color: Colors.black,
                                               fontWeight: FontWeight.bold,
                                               fontSize: 15,
@@ -321,7 +322,7 @@ class _EventsByDateWidgetState extends State<EventsByDateWidget> {
 
                                         Text(
                                           "${task['heure_deb']} - ${task['heure_fin']}",
-                                          style: const TextStyle(
+                                          style: GoogleFonts.beVietnamPro(
                                             color: Colors.black54,
                                             fontWeight: FontWeight.w500,
                                           ),
@@ -342,7 +343,7 @@ class _EventsByDateWidgetState extends State<EventsByDateWidget> {
 
                                         Text(
                                           task['localisation'],
-                                          style: const TextStyle(
+                                          style: GoogleFonts.beVietnamPro(
                                             color: Colors.black54,
                                             fontWeight: FontWeight.w500,
                                           ),

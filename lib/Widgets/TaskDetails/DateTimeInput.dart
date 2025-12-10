@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
 import 'package:muslim_proj/Constants.dart';
 
@@ -147,7 +148,7 @@ class _DateTimeInputState extends State<DateTimeInput> {
       children: [
         Text(
           label,
-          style: TextStyle(
+          style: GoogleFonts.beVietnamPro(
             fontWeight: FontWeight.bold,
             color: Colors.black87,
           ),
@@ -166,7 +167,7 @@ class _DateTimeInputState extends State<DateTimeInput> {
             ),
             child: Text(
               formattedDate,
-              style: TextStyle(
+              style: GoogleFonts.beVietnamPro(
                 fontSize: 16,
                 color: selectedDateTime != null ? Colors.black87 : Colors.grey.shade500,
               ),

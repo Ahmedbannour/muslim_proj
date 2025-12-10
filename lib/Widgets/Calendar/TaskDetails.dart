@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_multi_select_items/flutter_multi_select_items.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:geocoding/geocoding.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:intl/intl.dart';
 import 'package:muslim_proj/Constants.dart';
@@ -295,8 +296,7 @@ class _TaskDetailsState extends State<TaskDetails> {
         ),
         title: Text(
           task['label'].toString(),
-          style: TextStyle(
-              fontFamily: 'OpenSansBold',
+          style: GoogleFonts.beVietnamPro(
               color: Colors.white,
               fontWeight: FontWeight.bold
           ),
@@ -357,7 +357,7 @@ class _TaskDetailsState extends State<TaskDetails> {
                           Container(
                             child: Text(
                               "Task Title",
-                              style: TextStyle(
+                              style: GoogleFonts.beVietnamPro(
                                   color: Colors.black,
                                   fontWeight: FontWeight.bold
                               ),
@@ -370,7 +370,7 @@ class _TaskDetailsState extends State<TaskDetails> {
                             clipBehavior: Clip.antiAliasWithSaveLayer,
                             focusNode: titreNode,
                             decoration: InputDecoration(
-                              hintStyle: const TextStyle(color: Colors.grey),
+                              hintStyle: GoogleFonts.beVietnamPro(color: Colors.grey),
                               fillColor: Colors.white,
                               filled: true,
                               contentPadding: const EdgeInsets.symmetric(vertical: 0, horizontal: 8),
@@ -412,7 +412,7 @@ class _TaskDetailsState extends State<TaskDetails> {
                           Container(
                             child: Text(
                               "Categories",
-                              style: TextStyle(
+                              style: GoogleFonts.beVietnamPro(
                                   color: Colors.black,
                                   fontWeight: FontWeight.bold
                               ),
@@ -454,15 +454,15 @@ class _TaskDetailsState extends State<TaskDetails> {
 
                               maxSelectableCount: 2,
                               textStyles: MultiSelectTextStyles(
-                                  selectedTextStyle: TextStyle(
+                                  selectedTextStyle: GoogleFonts.beVietnamPro(
                                       color: Colors.white,
                                       fontWeight: FontWeight.w600
                                   ),
-                                  disabledTextStyle: TextStyle(
+                                  disabledTextStyle: GoogleFonts.beVietnamPro(
                                       color: Colors.black,
                                       fontWeight: FontWeight.w600
                                   ),
-                                  textStyle: TextStyle(
+                                  textStyle: GoogleFonts.beVietnamPro(
                                       color: Colors.black,
                                       fontWeight: FontWeight.w400
                                   )
@@ -541,7 +541,7 @@ class _TaskDetailsState extends State<TaskDetails> {
                           Container(
                             child: Text(
                               "Participants",
-                              style: TextStyle(
+                              style: GoogleFonts.beVietnamPro(
                                   color: Colors.black,
                                   fontWeight: FontWeight.bold
                               ),
@@ -635,7 +635,7 @@ class _TaskDetailsState extends State<TaskDetails> {
 
                                             Text(
                                               users[index-1]['name'].toString(),
-                                              style: TextStyle(
+                                              style: GoogleFonts.beVietnamPro(
                                                   fontWeight: FontWeight.w500,
                                                   color: (users[index - 1]['selected'] == null || users[index - 1]['selected'] == false) ? Colors.black : Colors.white
                                               ),
@@ -659,7 +659,7 @@ class _TaskDetailsState extends State<TaskDetails> {
                           Container(
                             child: Text(
                               "Localisation",
-                              style: TextStyle(
+                              style: GoogleFonts.beVietnamPro(
                                   color: Colors.black,
                                   fontWeight: FontWeight.bold
                               ),
@@ -736,7 +736,7 @@ class _TaskDetailsState extends State<TaskDetails> {
                           //             _selectedLocation ?? 'Choisir votre localisation',
                           //             overflow: TextOverflow.ellipsis,
                           //             maxLines: 1,
-                          //             style: TextStyle(
+                          //             style: GoogleFonts.beVietnamPro(
                           //               color: _selectedLocation == null
                           //                   ? Colors.grey
                           //                   : Colors.black87,
@@ -799,12 +799,12 @@ class _TaskDetailsState extends State<TaskDetails> {
                                     }).toList(),
                                     hint: Text(
                                       'Locations',
-                                      style: TextStyle(
+                                      style: GoogleFonts.beVietnamPro(
                                           color: Color(0xff808080),
                                           fontSize: 16
                                       ),
                                     ),
-                                    style: TextStyle(
+                                    style: GoogleFonts.beVietnamPro(
                                         color: KPrimaryColor
                                     ),
                                     onChanged: (newValue) {
@@ -853,15 +853,14 @@ class _TaskDetailsState extends State<TaskDetails> {
                                               ),
                                               label: Text(
                                                 'locations',
-                                                style: TextStyle(
-                                                    fontFamily: 'OpenSansBold',
+                                                style: GoogleFonts.beVietnamPro(
                                                     color: KPrimaryColor
                                                 ),
                                               ),
                                               filled: true,
                                               fillColor: Colors.white,
                                               hintText: 'Choisissez une localisation',
-                                              labelStyle: TextStyle(
+                                              labelStyle: GoogleFonts.beVietnamPro(
                                                 color: Color(0xff808080),
                                               ),
                                               prefixIcon: Icon(
@@ -879,7 +878,7 @@ class _TaskDetailsState extends State<TaskDetails> {
                                           alignment: Alignment.centerLeft,
                                           child: Text(
                                             item['label'],
-                                            style: const TextStyle(
+                                            style: GoogleFonts.beVietnamPro(
                                               color: KPrimaryColor,
                                               fontWeight: FontWeight.w600,
                                             ),
@@ -944,7 +943,7 @@ class _TaskDetailsState extends State<TaskDetails> {
                           Container(
                             child: Text(
                               "Description",
-                              style: TextStyle(
+                              style: GoogleFonts.beVietnamPro(
                                   color: Colors.black,
                                   fontWeight: FontWeight.bold
                               ),
@@ -959,7 +958,7 @@ class _TaskDetailsState extends State<TaskDetails> {
                             clipBehavior: Clip.antiAliasWithSaveLayer,
                             focusNode: descNode,
                             decoration: InputDecoration(
-                                hintStyle: const TextStyle(color: Colors.grey),
+                                hintStyle: GoogleFonts.beVietnamPro(color: Colors.grey),
                                 contentPadding: const EdgeInsets.symmetric(vertical: 8, horizontal: 16),
                                 border: OutlineInputBorder(
                                     borderRadius: BorderRadius.circular(8), // coins arrondis
@@ -1035,7 +1034,7 @@ class _TaskDetailsState extends State<TaskDetails> {
                         child: Center(
                           child: Text(
                             'Enregistrer',
-                            style: TextStyle(
+                            style: GoogleFonts.beVietnamPro(
                               color: Colors.white,
                               fontWeight: FontWeight.bold
                             ),

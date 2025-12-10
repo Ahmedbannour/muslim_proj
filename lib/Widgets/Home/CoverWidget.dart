@@ -158,10 +158,11 @@ class _CoverWidgetState extends State<CoverWidget> {
                     children: [
                       Container(
                         child: Text(
-                            "RAMAINING",
-                            style: GoogleFonts.rubik(
-
-                            )
+                          "REMAINING TIME",
+                          style: GoogleFonts.beVietnamPro(
+                            fontWeight: FontWeight.w500,
+                            fontSize: 12
+                          )
                         ),
                       ),
 
@@ -169,8 +170,8 @@ class _CoverWidgetState extends State<CoverWidget> {
                       Container(
                         child: Text(
                             "Maghrib 0:53:30",
-                            style: GoogleFonts.rubik(
-                                fontWeight: FontWeight.w500
+                            style: GoogleFonts.beVietnamPro(
+                                fontWeight: FontWeight.w600
                             )
                         ),
                       ),
@@ -200,8 +201,9 @@ class _CoverWidgetState extends State<CoverWidget> {
                       Container(
                         child: Text(
                             getDate(),
-                            style: GoogleFonts.rubik(
-
+                            style: GoogleFonts.beVietnamPro(
+                                fontWeight: FontWeight.w500,
+                                fontSize: 12
                             )
                         ),
                       ),
@@ -210,8 +212,8 @@ class _CoverWidgetState extends State<CoverWidget> {
                       Container(
                         child: Text(
                             "Monastir , Tunisia",
-                            style: GoogleFonts.rubik(
-                                fontWeight: FontWeight.w500
+                            style: GoogleFonts.beVietnamPro(
+                              fontWeight: FontWeight.w600
                             )
                         ),
                       ),

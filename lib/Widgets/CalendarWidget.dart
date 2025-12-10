@@ -204,7 +204,7 @@ class _CalendarWidgetState extends State<CalendarWidget> {
                   Icons.chevron_right_rounded,
                   color: Colors.black54
               ),
-              titleTextStyle: TextStyle(
+              titleTextStyle: GoogleFonts.beVietnamPro(
                 fontSize: 18,
                 fontWeight: FontWeight.w600,
                 color: Colors.black87,
@@ -228,6 +228,43 @@ class _CalendarWidgetState extends State<CalendarWidget> {
               outsideDecoration: BoxDecoration(
                 borderRadius: BorderRadius.circular(8),
               ),
+              disabledTextStyle: GoogleFonts.beVietnamPro(
+
+              ),
+
+              selectedTextStyle: GoogleFonts.beVietnamPro(
+                color: Colors.white
+              ),
+
+              defaultTextStyle: GoogleFonts.beVietnamPro(
+                color: Colors.black
+              ),
+
+              holidayTextStyle: GoogleFonts.beVietnamPro(
+                fontWeight: FontWeight.w600
+              ),
+              outsideTextStyle: GoogleFonts.beVietnamPro(
+                color: Colors.grey
+              ),
+              todayTextStyle: GoogleFonts.beVietnamPro(
+                fontWeight: FontWeight.w600,
+              ),
+
+              weekendTextStyle: GoogleFonts.beVietnamPro(
+
+              ),
+
+              weekNumberTextStyle: GoogleFonts.beVietnamPro(
+
+              ),
+
+              rangeEndTextStyle: GoogleFonts.beVietnamPro(
+
+              ),
+
+              withinRangeTextStyle: GoogleFonts.beVietnamPro(
+
+              )
             ),
             calendarBuilders: CalendarBuilders(
               defaultBuilder: (context, day, focusedDay) {
@@ -241,7 +278,12 @@ class _CalendarWidgetState extends State<CalendarWidget> {
                     decoration: BoxDecoration(
                       borderRadius: BorderRadius.circular(8),
                     ),
-                    child: Text('${day.day}'),
+                    child: Text(
+                      '${day.day}',
+                      style: GoogleFonts.beVietnamPro(
+
+                      ),
+                    ),
                   ),
                 );
               },

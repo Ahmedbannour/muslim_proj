@@ -1,6 +1,7 @@
 import 'dart:math' as math;
 import 'package:flutter/material.dart';
 import 'package:flutter_compass/flutter_compass.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:muslim_proj/Constants.dart';
 
 class QiblaWidget extends StatelessWidget {
@@ -245,7 +246,7 @@ class QiblaWidget extends StatelessWidget {
             Text(
               '${direction.floor()}°',  // ✅ ici le changement
               textAlign: TextAlign.center,
-              style: TextStyle(
+              style: GoogleFonts.beVietnamPro(
                 fontSize: 24,
                 fontWeight: FontWeight.bold,
                 color: isNearQibla ? Colors.green : KTextColor,
@@ -257,14 +258,16 @@ class QiblaWidget extends StatelessWidget {
             Text(
               'Orientation de l’appareil vers la Qibla',
               textAlign: TextAlign.center,
-              style: TextStyle(
+              style: GoogleFonts.beVietnamPro(
                 fontSize: 16,
+                fontWeight: FontWeight.w500,
                 color: isNearQibla ? Colors.green : KTextColor,
               ),
             ),
 
 
-            SizedBox(height: 32),
+            SizedBox(height: 16),
+
             Container(
               decoration: BoxDecoration(
                 color: KPrimaryColor.withOpacity(.1),
@@ -275,7 +278,7 @@ class QiblaWidget extends StatelessWidget {
                 child: Text(
                   guidanceText,
                   textAlign: TextAlign.center,
-                  style: TextStyle(
+                  style: GoogleFonts.beVietnamPro(
                     fontSize: 14,
                     fontWeight: FontWeight.bold,
                     color: isNearQibla ? Colors.green : KPrimaryColor,
@@ -297,7 +300,7 @@ class QiblaWidget extends StatelessWidget {
         padding: const EdgeInsets.all(12.0),
         child: Text(
           label,
-          style: const TextStyle(
+          style: GoogleFonts.beVietnamPro(
             fontWeight: FontWeight.bold,
             fontSize: 22,
             color: Colors.black54,

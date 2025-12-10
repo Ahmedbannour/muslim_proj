@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:dotted_border/dotted_border.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:muslim_proj/Constants.dart';
 import 'package:muslim_proj/Widgets/TaskDetails/DateInput.dart';
@@ -99,8 +100,7 @@ class _AddParticipantWidgetState extends State<AddParticipantWidget> {
         ),
         title: Text(
           "participants",
-          style: TextStyle(
-              fontFamily: 'OpenSansBold',
+          style: GoogleFonts.beVietnamPro(
               color: Colors.white,
               fontWeight: FontWeight.bold
           ),
@@ -191,7 +191,7 @@ class _AddParticipantWidgetState extends State<AddParticipantWidget> {
                   
                                         Text(
                                           "Click to upload image",
-                                          style: TextStyle(
+                                          style: GoogleFonts.beVietnamPro(
                                               color: Colors.black,
                                               fontWeight: FontWeight.bold,
                                               fontSize: 20
@@ -202,7 +202,7 @@ class _AddParticipantWidgetState extends State<AddParticipantWidget> {
                   
                                         Text(
                                           "jpg , png ( 12MB max )",
-                                          style: TextStyle(
+                                          style: GoogleFonts.beVietnamPro(
                                             color: Colors.black54,
                                             fontWeight: FontWeight.w500,
                                           ),
@@ -222,7 +222,7 @@ class _AddParticipantWidgetState extends State<AddParticipantWidget> {
                         Container(
                           child: Text(
                             "nom",
-                            style: TextStyle(
+                            style: GoogleFonts.beVietnamPro(
                                 color: Colors.black,
                                 fontWeight: FontWeight.bold
                             ),
@@ -235,7 +235,7 @@ class _AddParticipantWidgetState extends State<AddParticipantWidget> {
                           clipBehavior: Clip.antiAliasWithSaveLayer,
                           focusNode: nameNode,
                           decoration: InputDecoration(
-                              hintStyle: const TextStyle(color: Colors.grey),
+                              hintStyle: GoogleFonts.beVietnamPro(color: Colors.grey),
                               fillColor: Colors.white,
                               filled: true,
                               contentPadding: const EdgeInsets.symmetric(vertical: 0, horizontal: 8),
@@ -276,7 +276,7 @@ class _AddParticipantWidgetState extends State<AddParticipantWidget> {
                         Container(
                           child: Text(
                             "Télephone",
-                            style: TextStyle(
+                            style: GoogleFonts.beVietnamPro(
                                 color: Colors.black,
                                 fontWeight: FontWeight.bold
                             ),
@@ -289,7 +289,7 @@ class _AddParticipantWidgetState extends State<AddParticipantWidget> {
                           clipBehavior: Clip.antiAliasWithSaveLayer,
                           focusNode: numNode,
                           decoration: InputDecoration(
-                              hintStyle: const TextStyle(color: Colors.grey),
+                              hintStyle: GoogleFonts.beVietnamPro(color: Colors.grey),
                               fillColor: Colors.white,
                               filled: true,
                   
@@ -380,7 +380,7 @@ class _AddParticipantWidgetState extends State<AddParticipantWidget> {
                             child: Center(
                               child: Text(
                                 'Enregistrer',
-                                style: TextStyle(
+                                style: GoogleFonts.beVietnamPro(
                                   color: Colors.white,
                                   fontWeight: FontWeight.bold
                                 ),

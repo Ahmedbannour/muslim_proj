@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:google_fonts/google_fonts.dart';
+import 'package:hive/hive.dart';
 import 'package:muslim_proj/Constants.dart';
 
 
@@ -72,7 +74,7 @@ class _MenuWidgetState extends State<MenuWidget> {
             shrinkWrap: true,
             gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
                 crossAxisCount: 2, // number of columns
-                crossAxisSpacing: 8, // horizontal space
+                crossAxisSpacing: 4, // horizontal space
                 mainAxisSpacing: 24, // vertical space
                 childAspectRatio: 0.8
             ),
@@ -91,10 +93,16 @@ class _MenuWidgetState extends State<MenuWidget> {
 
                   Padding(
                     padding: const EdgeInsets.all(8.0),
-                    child: Text(
-                      items[index]['name'],
-                      style: TextStyle(
-                          fontWeight: FontWeight.w500
+                    child: FittedBox(
+                      fit: BoxFit.contain,
+                      child: Text(
+                        items[index]['name'],
+                        style: GoogleFonts.beVietnamPro(
+                            fontWeight: FontWeight.w600
+                        ),
+                        textAlign: TextAlign.center,
+                        overflow: TextOverflow.ellipsis,
+                        maxLines: 1,
                       ),
                     ),
                   )

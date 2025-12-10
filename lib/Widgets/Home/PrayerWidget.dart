@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:muslim_proj/Constants.dart';
 import 'package:muslim_proj/Services/PrayersInfo.dart';
@@ -33,7 +34,7 @@ class _PrayerWidgetState extends State<PrayerWidget> {
                 padding: const EdgeInsets.symmetric(horizontal: 16.0),
                 child: Text(
                   "Prayer Time" ,
-                  style: TextStyle(
+                  style: GoogleFonts.beVietnamPro(
                       fontWeight: FontWeight.bold,
                       fontSize: 20
                   ),
@@ -52,9 +53,10 @@ class _PrayerWidgetState extends State<PrayerWidget> {
                       return ListView.builder(
                         itemCount: res.length,
                         scrollDirection: Axis.horizontal,
+                        shrinkWrap: true,
                         itemBuilder: (context , index){
                           return Padding(
-                            padding: const EdgeInsets.all(8.0),
+                            padding: const EdgeInsets.all(4.0),
                             child: Container(
                               decoration: BoxDecoration(
                                   color: KPrimaryColor.withOpacity(.1),
@@ -64,6 +66,7 @@ class _PrayerWidgetState extends State<PrayerWidget> {
                               child: Padding(
                                 padding: const EdgeInsets.all(16.0),
                                 child: Column(
+                                  mainAxisSize: MainAxisSize.min,
                                   children: [
                                     SvgPicture.asset(
                                       'assets/icons/${res[index]['icon']}.svg',
@@ -79,19 +82,19 @@ class _PrayerWidgetState extends State<PrayerWidget> {
                                     Text(
                                       res[index]['label'],
 
-                                      style: TextStyle(
+                                      style: GoogleFonts.beVietnamPro(
                                         fontWeight: FontWeight.w400,
                                       ),
                                     ),
 
 
-                                    SizedBox(height: 8),
+                                    SizedBox(height: 4),
 
 
                                     Text(
                                       res[index]['time'],
 
-                                      style: TextStyle(
+                                      style: GoogleFonts.beVietnamPro(
                                           fontWeight: FontWeight.bold
                                       ),
                                     ),
@@ -115,6 +118,8 @@ class _PrayerWidgetState extends State<PrayerWidget> {
                   }
               ),
             ),
+
+            SizedBox(height: 16)
           ],
         )
     );
