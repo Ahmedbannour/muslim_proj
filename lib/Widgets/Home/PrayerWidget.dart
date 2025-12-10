@@ -124,8 +124,6 @@ class _PrayerWidgetState extends State<PrayerWidget> {
   Future<List<Map<String,dynamic>>>  getPrayersInfo() async{
     final location = await getCurrentLocation();
 
-
-    print('latitude :${location.latitude} , longitude : ${location.longitude} ');
     return await Provider.of<PrayersInfoService>(context , listen: false).getPrayerInfos(DateTime.now() , LatLng(location.latitude, location.longitude));
   }
 }

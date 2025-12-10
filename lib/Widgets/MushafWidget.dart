@@ -32,7 +32,7 @@ class _MushafWidgetState extends State<MushafWidget> {
     surah = widget.surah;
     surahNumber = widget.surahNumber;
     _getSurahDetails = getSurahDetails(surahNumber);
-    _getSurahAudio = getSurahAudio(surahNumber);
+    // _getSurahAudio = getSurahAudio(surahNumber);
   }
 
   @override
@@ -84,8 +84,7 @@ class _MushafWidgetState extends State<MushafWidget> {
       context: ctx,
       isScrollControlled: true,
       barrierColor: KPrimaryColor.withOpacity(.2),
-      useSafeArea: true,
-      backgroundColor: Colors.white,
+      backgroundColor: KBackgroundColor,
       shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(top: Radius.circular(32)),
       ),
@@ -96,6 +95,7 @@ class _MushafWidgetState extends State<MushafWidget> {
             ),
             child: AyahDetails(oldContext: ctx,surah: surah , ayahNum: ayahNum , text: text,toArabicIndic: _toArabicIndic,)
         );
+
       },
     );
   }
@@ -350,20 +350,22 @@ class _MushafWidgetState extends State<MushafWidget> {
                   bottom: 0,
                   right: 0,
                   left: 0,
-                  child: FutureBuilder(
-                    future: _getSurahAudio,
-                    builder: (context , snapshot) {
-                      if(snapshot.hasError){
-                        return Center(child: Text('Error: ${snapshot.error}'));
-                      }else if(snapshot.hasData){
-                        return AudioReader(url: "https://cdn.islamic.network/quran/audio-surah/128/ar.alafasy/1.mp3");
-                      }
+                  child: AudioReader(url: "https://cdn.islamic.network/quran/audio-surah/128/ar.alafasy/$surahNumber.mp3"),
 
-                      return Center(
-                        child: CircularProgressIndicator(),
-                      );
-                    }
-                  ),
+                  // child: FutureBuilder(
+                  //   future: _getSurahAudio,
+                  //   builder: (context , snapshot) {
+                  //     if(snapshot.hasError){
+                  //       return Center(child: Text('Error: ${snapshot.error}'));
+                  //     }else if(snapshot.hasData){
+                  //       return AudioReader(url: "https://cdn.islamic.network/quran/audio-surah/128/ar.alafasy/$surahNumber.mp3");
+                  //     }
+                  //
+                  //     return Center(
+                  //       child: CircularProgressIndicator(),
+                  //     );
+                  //   }
+                  // ),
                 )
               ],
             );

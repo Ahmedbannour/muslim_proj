@@ -74,6 +74,78 @@ class QuranService extends ChangeNotifier {
 
       final data = response.data;
 
+      print('getSurahDetails : $data');
+
+      notifyListeners();
+
+      // Vérification et cast
+      if(data != null ){
+        return data;
+      }
+
+      return {
+        "error" : 1 ,
+        "message" : "probleme d api"
+      };
+
+    } on DioError catch (error) {
+      if (error.type == DioErrorType && error.error is HandshakeException) {
+        // Handle HandshakeException here
+
+
+        return {
+          "error" : 1 ,
+          "message" : "probleme d api"
+        };
+
+      } else if (error.error is HttpException) {
+        HttpException httpException = error.error as HttpException;
+        if (httpException.message == 'Connection closed before full header was received') {
+
+
+
+          return {
+            "error" : 1 ,
+            "message" : "probleme d api"
+          };
+
+        }
+      }else if (error.type == DioErrorType.receiveTimeout || error.error is SocketException) {
+        // Handle the timeout error here
+
+
+        return {
+          "error" : 1 ,
+          "message" : "probleme d api"
+        };
+
+      }else if (error.response?.statusCode == 403) {
+        print('40333333333333333333333333333333333333333333333333333333333333333333');
+
+
+      }
+      // Handle other DioErrors
+      throw error.message.toString();
+    } catch (error) {
+      // Handle other errors
+      throw error.toString();
+    }
+  }
+
+
+  Future<Map<String,dynamic>> getAyahDetails(int ayahNum , Map<String , dynamic> surah) async {
+
+    try {
+
+      final response = await dio().get(
+          'ayah/${surah["number"]}:$ayahNum/ar.alafasy'
+      );
+
+
+      final data = response.data;
+
+      print('getAyahDetails : $data');
+
       notifyListeners();
 
       // Vérification et cast

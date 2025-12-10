@@ -10,9 +10,6 @@ import 'package:intl/intl.dart';
 class PrayersInfoService extends ChangeNotifier {
 
   Future<List<Map<String,dynamic>>> getPrayerInfos(DateTime date , LatLng location) async {
-    print('latitudess : ${location.latitude} , longitude : ${location.longitude}');
-    print('datee : ${DateFormat('dd-MM-yyyy', 'fr_FR').format(DateTime.now())}');
-
     String dateFormatted = DateFormat('dd-MM-yyyy', 'fr_FR').format(date);
 
 
@@ -31,17 +28,12 @@ class PrayersInfoService extends ChangeNotifier {
 
       if(response.data != null && response.data['data'] != null && response.data['data']['timings'] != null){
         Map<String,dynamic> tt = response.data['data']['timings'];
-        print('tt : $tt');
 
         tt.forEach((key , value){
-          print('key : $key');
-          print('value :$value');
-
           Map<String,dynamic> elem = {
             "label" : key,
             "time" : value,
           };
-
 
           if(key == "Fajr"){
             elem['icon'] = "cloud-sun";
@@ -59,7 +51,6 @@ class PrayersInfoService extends ChangeNotifier {
 
         return timings;
       }
-
 
       var res = response.data;
 
