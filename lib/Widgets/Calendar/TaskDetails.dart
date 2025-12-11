@@ -217,8 +217,6 @@ class _TaskDetailsState extends State<TaskDetails> {
 
   DateTime? selectedDateTimeBegin;
   DateTime? selectedDateTimeEnd;
-  String? _selectedLocation;
-  LatLng? _selectedLatLng;
   final GlobalKey<FormFieldState<dynamic>> dropdownKey = GlobalKey<FormFieldState<dynamic>>();
   TextEditingController searchContentSetor = TextEditingController();
 

@@ -3,11 +3,13 @@ import 'dart:io';
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
+import 'package:hive/hive.dart';
 import 'package:muslim_proj/Services/dio.dart';
 import 'package:intl/intl.dart';
 import 'package:path_provider/path_provider.dart';
 
 class QuranService extends ChangeNotifier {
+  var box = Hive.box('muslim_proj');
 
   Future<List<Map<String,dynamic>>> getQuranAll() async {
 
@@ -134,11 +136,13 @@ class QuranService extends ChangeNotifier {
 
 
   Future<Map<String,dynamic>> getAyahDetails(int ayahNum , Map<String , dynamic> surah) async {
+    String? tajweedAyahId = box.get("tajweedAyahId");
 
+    print('getAyahDetails link : ${'ayah/${surah["number"]}:$ayahNum/${tajweedAyahId ?? 'ar.alafasy'}'}');
     try {
 
       final response = await dio().get(
-          'ayah/${surah["number"]}:$ayahNum/ar.alafasy'
+          'ayah/${surah["number"]}:$ayahNum/${tajweedAyahId ?? 'ar.alafasy'}'
       );
 
 
@@ -205,11 +209,12 @@ class QuranService extends ChangeNotifier {
 
   Future<Map<String,dynamic>> getAyahExplic(int ayahNum , Map<String , dynamic> surah) async {
 
-    print('ayah/${surah["number"]}:$ayahNum/ar.muyassar');
     try {
+      String? tafsirId = box.get("tafsirId");
+
 
       final response = await dio().get(
-          'ayah/${surah["number"]}:$ayahNum/ar.muyassar'
+          'ayah/${surah["number"]}:$ayahNum/${tafsirId ?? "ar.muyassar"}'
       );
 
 
@@ -276,13 +281,15 @@ class QuranService extends ChangeNotifier {
 
   Future<File> getSurahAudio(int surahNumber) async {
 
+    String? tajweedSurahId = box.get("tajweedSurahId");
+
     // Répertoire de stockage
     final dir = await getApplicationDocumentsDirectory();
     final file = File("${dir.path}/$surahNumber");
 
     try {
       final response = await Dio().get(
-        'https://cdn.islamic.network/quran/audio-surah/128/ar.alafasy/$surahNumber.mp3',
+        'https://cdn.islamic.network/quran/audio-surah/128/${tajweedSurahId ?? "ar.alafasy"}/$surahNumber.mp3',
         options: Options(
           responseType: ResponseType.bytes, // très important !
           followRedirects: true,

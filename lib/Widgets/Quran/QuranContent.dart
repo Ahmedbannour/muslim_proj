@@ -5,6 +5,7 @@ import 'package:muslim_proj/Constants.dart';
 import 'package:muslim_proj/Services/QuranService.dart';
 import 'package:muslim_proj/Widgets/MushafWidget.dart';
 import 'package:provider/provider.dart';
+import 'package:shimmer/shimmer.dart';
 
 
 
@@ -164,8 +165,11 @@ class _QuranContentState extends State<QuranContent> {
               }
 
 
-              return Center(
-                  child: CircularProgressIndicator()
+              return ListView.builder(
+                itemCount: 114,
+                itemBuilder: (context, index) {
+                  return quranShimmer();
+                },
               );
             },
           ),
@@ -285,6 +289,31 @@ class _QuranContentState extends State<QuranContent> {
                   ),
                 )
               ],
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
+
+  Widget quranShimmer (){
+    return Shimmer.fromColors(
+      baseColor: KPrimaryColor.withOpacity(0.03),
+      highlightColor: KPrimaryColor.withOpacity(0.1),
+      child: Padding(
+        padding: const EdgeInsets.symmetric(vertical: 8.0),
+        child: AnimatedContainer(
+          duration: Duration(milliseconds: 200),
+          decoration: BoxDecoration(
+            color: Colors.black,
+            borderRadius: BorderRadius.circular(16)
+          ),
+          clipBehavior: Clip.antiAliasWithSaveLayer,
+          child: Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: Container(
+              height: 60,
             ),
           ),
         ),

@@ -3,6 +3,7 @@ import 'package:flutter_svg/flutter_svg.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
 import 'package:muslim_proj/Constants.dart';
+import 'package:muslim_proj/Widgets/ConfigWidget.dart';
 import 'package:muslim_proj/Widgets/Dashboard/DashboardMenu.dart';
 import 'package:muslim_proj/Widgets/HomeWidget.dart';
 import 'package:permission_handler/permission_handler.dart';
@@ -78,13 +79,13 @@ class _DashboardWidgetState extends State<DashboardWidget> {
               right: 0,
               left: 0,
               child: Padding(
-                padding: EdgeInsets.symmetric(horizontal: 8),
+                padding: EdgeInsets.symmetric(horizontal: 16),
                 child: _title == "Calendrier" ? Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   crossAxisAlignment: CrossAxisAlignment.end,
                   children: [
                     Text(
-                      _title,
+                      _title.toUpperCase(),
                       style: GoogleFonts.beVietnamPro(
                           fontSize: 22,
                           fontWeight: FontWeight.w500
@@ -114,18 +115,27 @@ class _DashboardWidgetState extends State<DashboardWidget> {
                   crossAxisAlignment: CrossAxisAlignment.end,
                   children: [
                     GestureDetector(
-                      onTap: (){
-                        print('open Drawer');
+                      onTap: ()async{
+                        await Navigator.push(context, MaterialPageRoute(builder: (context) => ConfigWidget()));
                       },
                       child: AnimatedContainer(
                         duration: Duration(milliseconds: 200),
+                        decoration: BoxDecoration(
+                          color: KPrimaryColor.withOpacity(.05),
+                          borderRadius: BorderRadius.circular(16),
+                          border: Border.all(
+                            width: 2,
+                            color: KPrimaryColor.withOpacity(.2)
+                          )
+                        ),
                         height: 40,
                         width: 40,
                         child: Padding(
                           padding: const EdgeInsets.all(8.0),
                           child: SvgPicture.asset(
-                            "assets/icons/menu-burger.svg",
+                            "assets/icons/settings-sliders.svg",
                             fit: BoxFit.contain,
+                            color: KPrimaryColor,
                           ),
                         ),
                       ),
@@ -134,30 +144,15 @@ class _DashboardWidgetState extends State<DashboardWidget> {
 
 
                     Text(
-                      _title,
+                      _title.toUpperCase(),
                       style: GoogleFonts.beVietnamPro(
                         fontSize: 22,
-                        fontWeight: FontWeight.bold
+                        fontWeight: FontWeight.w700
                       ),
                     ),
 
-                    GestureDetector(
-                      onTap: (){
-                        print('open search');
-                      },
-                      child: AnimatedContainer(
-                        duration: Duration(milliseconds: 200),
-                        height: 40,
-                        width: 40,
-                        child: Padding(
-                          padding: const EdgeInsets.all(8.0),
-                          child: SvgPicture.asset(
-                            "assets/icons/search.svg",
-                            fit: BoxFit.contain,
-                          ),
-                        ),
-                      ),
-                    ),
+                    Container()
+
                   ],
                 ),
               ),

@@ -6,7 +6,6 @@ import 'package:muslim_proj/Widgets/CalendarWidget.dart';
 import 'package:muslim_proj/Widgets/HomeWidget.dart';
 import 'package:muslim_proj/Widgets/QiblaWidget.dart';
 import 'package:muslim_proj/Widgets/QuranWidget.dart';
-import 'package:muslim_proj/Widgets/TasbihWidget.dart';
 import 'dart:math' as math;
 
 
@@ -113,7 +112,7 @@ class _DashboardMenuState extends State<DashboardMenu> {
         setState((){
           if(id == 1){
             currentPage = DashboardItems.Home;
-            widget.updateTitle('Home');
+            widget.updateTitle('Deen Muslim');
             widget.updateContainer(HomeWidget() , id);
           }else if(id == 2){
             currentPage = DashboardItems.Quran;

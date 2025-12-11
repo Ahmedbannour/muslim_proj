@@ -19,6 +19,8 @@ class _AudioReaderState extends State<AudioReader> {
   @override
   void initState() {
     super.initState();
+
+    print('url : ${widget.url}');
     _player = AudioPlayer();
     _loadAudio(widget.url);
   }

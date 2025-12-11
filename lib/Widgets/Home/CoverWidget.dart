@@ -57,7 +57,7 @@ class _CoverWidgetState extends State<CoverWidget> {
                     KBackgroundColor, // jaune clair vers blanc (extérieur)
                   ],
                   center: Alignment.bottomCenter,
-                  radius: 0.8, // contrôle la taille du cercle
+                  radius: 1, // contrôle la taille du cercle
                 ),
               )
           ),
@@ -140,7 +140,6 @@ class _CoverWidgetState extends State<CoverWidget> {
                 gradient: LinearGradient(
                     colors: [
                       Color(0xFFFCE5C1), // orange (centre)
-                      Color(0xFFFCE5C1), // orange (centre)
                       KBackgroundColor, // jaune clair vers blanc (extérieur)
                     ],
                     begin: Alignment.topCenter,
@@ -198,14 +197,12 @@ class _CoverWidgetState extends State<CoverWidget> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      Container(
-                        child: Text(
-                            getDate(),
-                            style: GoogleFonts.beVietnamPro(
-                                fontWeight: FontWeight.w500,
-                                fontSize: 12
-                            )
-                        ),
+                      Text(
+                          getDate(),
+                          style: GoogleFonts.beVietnamPro(
+                              fontWeight: FontWeight.w500,
+                              fontSize: 12
+                          )
                       ),
 
 

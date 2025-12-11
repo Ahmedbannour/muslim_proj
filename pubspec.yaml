@@ -78,6 +78,7 @@ dependencies:
   just_audio: ^0.9.36
   audio_session: ^0.1.13
   rxdart: ^0.27.7
+  shimmer: ^3.0.0
 
 
 dev_dependencies:

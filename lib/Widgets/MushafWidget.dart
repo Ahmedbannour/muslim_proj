@@ -4,6 +4,7 @@ import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:hive/hive.dart';
 import 'package:muslim_proj/Constants.dart';
 import 'package:muslim_proj/Services/QuranService.dart';
 import 'package:muslim_proj/Widgets/AyahDetails.dart';
@@ -25,6 +26,10 @@ class _MushafWidgetState extends State<MushafWidget> {
   late Future<Map<String, dynamic>> _getSurahDetails;
   late Future<File> _getSurahAudio;
   final List<TapGestureRecognizer> _tapRecognizers = [];
+  var box = Hive.box('muslim_proj');
+
+  String? tajweedSurahId;
+
 
   @override
   void initState() {
@@ -32,6 +37,7 @@ class _MushafWidgetState extends State<MushafWidget> {
     surah = widget.surah;
     surahNumber = widget.surahNumber;
     _getSurahDetails = getSurahDetails(surahNumber);
+    tajweedSurahId = box.get("tajweedSurahId");
     // _getSurahAudio = getSurahAudio(surahNumber);
   }
 
@@ -350,7 +356,7 @@ class _MushafWidgetState extends State<MushafWidget> {
                   bottom: 0,
                   right: 0,
                   left: 0,
-                  child: AudioReader(url: "https://cdn.islamic.network/quran/audio-surah/128/ar.alafasy/$surahNumber.mp3"),
+                  child: AudioReader(url: "https://cdn.islamic.network/quran/audio-surah/128/${tajweedSurahId ?? "ar.alafasy"}/$surahNumber.mp3"),
 
                   // child: FutureBuilder(
                   //   future: _getSurahAudio,
