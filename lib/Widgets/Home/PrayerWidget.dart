@@ -6,6 +6,7 @@ import 'package:muslim_proj/Constants.dart';
 import 'package:muslim_proj/Services/PrayersInfo.dart';
 import 'package:muslim_proj/Services/SimpleLatLng.dart';
 import 'package:provider/provider.dart';
+import 'package:shimmer/shimmer.dart';
 
 
 
@@ -112,8 +113,28 @@ class _PrayerWidgetState extends State<PrayerWidget> {
                       );
                     }
 
-                    return Center(
-                      child: CircularProgressIndicator(),
+                    return Shimmer.fromColors(
+                      baseColor: KPrimaryColor.withOpacity(0.3),
+                      highlightColor: KPrimaryColor.withOpacity(0.8),
+                      child: ListView.builder(
+                        itemCount: 5,
+                        scrollDirection: Axis.horizontal,
+                        itemBuilder: (context , index){
+                          return Padding(
+                            padding: const EdgeInsets.all(4.0),
+                            child: Container(
+                              decoration: BoxDecoration(
+                                  color: KPrimaryColor.withOpacity(.1),
+                                  borderRadius: BorderRadius.circular(8)
+                              ),
+                              clipBehavior: Clip.antiAliasWithSaveLayer,
+                              child: Container(
+                                width: 80,
+                              ),
+                            ),
+                          );
+                        },
+                      ),
                     );
                   }
               ),
@@ -128,7 +149,7 @@ class _PrayerWidgetState extends State<PrayerWidget> {
 
   Future<List<Map<String,dynamic>>>  getPrayersInfo() async{
     final location = await getCurrentLocation();
-
+    
     return await Provider.of<PrayersInfoService>(context , listen: false).getPrayerInfos(DateTime.now() , LatLng(location.latitude, location.longitude));
   }
 }
