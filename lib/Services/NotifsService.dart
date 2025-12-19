@@ -144,5 +144,5 @@ class NotifsService {
   Future<void> cancelAll() async {
     await notificationsPlugin.cancelAll();
   }
-  
+
 }

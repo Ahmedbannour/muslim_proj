@@ -4,7 +4,6 @@ import 'package:muslim_proj/Constants.dart';
 import 'package:muslim_proj/Services/NotifsService.dart';
 import 'package:muslim_proj/Services/SimpleLatLng.dart';
 import 'package:workmanager/workmanager.dart';
-import 'dart:io';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:intl/intl.dart';
 
