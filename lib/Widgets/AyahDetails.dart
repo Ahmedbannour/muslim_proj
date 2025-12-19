@@ -11,7 +11,7 @@ class AyahDetails extends StatefulWidget {
   final BuildContext oldContext;
   final int ayahNum;
   final String text;
-  final Map<String, dynamic> surah;
+  final Map<dynamic, dynamic> surah;
   final Function(int) toArabicIndic;
   const AyahDetails({super.key, required this.ayahNum , required this.text , required this.oldContext , required this.surah , required this.toArabicIndic});
 
@@ -25,13 +25,13 @@ class _AyahDetailsState extends State<AyahDetails> {
   late BuildContext oldContext;
   late int ayahNum;
   late String text;
-  late Map<String, dynamic> surah;
+  late Map<dynamic, dynamic> surah;
 
   final List<InlineSpan> spans = [];
 
-  late Future<Map<String , dynamic>> getAyahExpilic;
+  late Future<Map<dynamic , dynamic>> getAyahExpilic;
 
-  late Future<Map<String , dynamic>> _getAyahDetails;
+  late Future<Map<dynamic , dynamic>> _getAyahDetails;
 
 
   @override
@@ -285,12 +285,12 @@ class _AyahDetailsState extends State<AyahDetails> {
     );
   }
 
-  Future<Map<String,dynamic>> getAyahExplic(int ayahNum , Map<String , dynamic> surah)async{
+  Future<Map<dynamic,dynamic>> getAyahExplic(int ayahNum , Map<dynamic , dynamic> surah)async{
     return await Provider.of<QuranService>(context , listen: false).getAyahExplic(ayahNum, surah);
   }
 
 
-  Future<Map<String,dynamic>> getAyahDetails(Map<String , dynamic> surah,int ayahNum )async{
+  Future<Map<dynamic,dynamic>> getAyahDetails(Map<dynamic , dynamic> surah,int ayahNum )async{
     return await Provider.of<QuranService>(context , listen: false).getAyahDetails(ayahNum, surah);
   }
 }

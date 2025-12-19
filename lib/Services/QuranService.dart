@@ -9,14 +9,42 @@ import 'package:intl/intl.dart';
 import 'package:path_provider/path_provider.dart';
 
 class QuranService extends ChangeNotifier {
-  var box = Hive.box('muslim_proj');
+    var box = Hive.box('muslim_proj');
 
-  Future<List<Map<String,dynamic>>> getQuranAll() async {
+  Future<List<Map<dynamic,dynamic>>> getQuranAll() async {
+    try {
+      final response = await dio().get('surah');
+      final data = response.data['data'] ?? [];
+      notifyListeners();
 
+      if (data is List) {
+        // Stocke dans Hive
+        box.put("quranList", data.map<Map<String, dynamic>>((e) => Map<String, dynamic>.from(e),).toList(),);
+
+        // Retourne la liste castée proprement
+        return data.map<Map<dynamic, dynamic>>((e) => Map<dynamic, dynamic>.from(e),).toList();
+      }
+
+      return [];
+    } on DioError catch (error) {
+      // Lecture sécurisée depuis Hive si erreur réseau
+      return [
+        {
+          "error" : error.type,
+          "message" : error.message
+        }
+      ];
+    } catch (error) {
+      throw error.toString();
+    }
+  }
+
+
+  Future<List<Map<dynamic , dynamic>>> downloadQuranList() async{
     try {
 
+      // check Api Surahs
       final response = await dio().get('surah');
-
 
       final data = response.data['data'] ?? [];
 
@@ -24,7 +52,9 @@ class QuranService extends ChangeNotifier {
 
       // Vérification et cast
       if (data is List) {
-        return data.map<Map<String, dynamic>>((e) => Map<String, dynamic>.from(e)).toList();
+
+        box.put("quranList" , data.map<Map<String, dynamic>>((e) => Map<String, dynamic>.from(e)).toList());
+        return data.map<Map<dynamic, dynamic>>((e) => Map<dynamic, dynamic>.from(e)).toList();
       }
 
       return [];
@@ -33,21 +63,42 @@ class QuranService extends ChangeNotifier {
       if (error.type == DioErrorType && error.error is HandshakeException) {
         // Handle HandshakeException here
 
+        List<Map<dynamic,dynamic>> oldQuranList = box.get('quranList') ?? [];
 
-        return [];
+
+
+        return [
+          {
+            "error" : 1,
+            "message" : "probleme de connexion"
+          }
+        ];
       } else if (error.error is HttpException) {
         HttpException httpException = error.error as HttpException;
         if (httpException.message == 'Connection closed before full header was received') {
 
 
+          List<Map<dynamic,dynamic>> oldQuranList = box.get('quranList') ?? [];
 
-          return [];
+          return [
+            {
+              "error" : 1,
+              "message" : "probleme de connexion"
+            }
+          ];
         }
       }else if (error.type == DioErrorType.receiveTimeout || error.error is SocketException) {
         // Handle the timeout error here
 
+        List<Map<dynamic,dynamic>> oldQuranList = box.get('quranList') ?? [];
 
-        return [];
+
+        return [
+          {
+            "error" : 1,
+            "message" : "probleme de connexion"
+          }
+        ];
       }else if (error.response?.statusCode == 403) {
         print('40333333333333333333333333333333333333333333333333333333333333333333');
 
@@ -64,8 +115,7 @@ class QuranService extends ChangeNotifier {
     }
   }
 
-
-  Future<Map<String,dynamic>> getSurahDetails(int surahNumber) async {
+  Future<Map<String,dynamic>> getSurahDetails(int surahNumber , Map<dynamic,dynamic> surah) async {
 
     try {
 
@@ -91,6 +141,93 @@ class QuranService extends ChangeNotifier {
       };
 
     } on DioError catch (error) {
+      if (error.type == DioErrorType && error.error is HandshakeException) {
+        // Handle HandshakeException here
+
+
+        print('1111');
+        Map<dynamic, dynamic> oldDetails = Map<dynamic, dynamic>.from(box.get('surah_details') ?? {});
+
+
+
+        return {
+          "error" : 1 ,
+          "message" : "probleme d api",
+          "data" : oldDetails[surah["englishName"]]
+        };
+
+      } else if (error.error is HttpException) {
+        HttpException httpException = error.error as HttpException;
+        if (httpException.message == 'Connection closed before full header was received') {
+
+
+          print('2222');
+          Map<dynamic, dynamic> oldDetails = Map<dynamic, dynamic>.from(box.get('surah_details') ?? {});
+
+
+
+          return {
+            "error" : 1 ,
+            "message" : "probleme d api",
+            "data" : oldDetails[surah["englishName"]]
+          };
+
+        }
+      }else if (error.type == DioErrorType.receiveTimeout || error.error is SocketException) {
+        // Handle the timeout error here
+
+        print('3333');
+
+        Map<dynamic, dynamic> oldDetails = Map<dynamic, dynamic>.from(box.get('surah_details') ?? {});
+
+
+
+        return {
+          "error" : 1 ,
+          "message" : "probleme d api",
+          "data" : oldDetails[surah["englishName"]]
+        };
+
+      }else if (error.response?.statusCode == 403) {
+        print('40333333333333333333333333333333333333333333333333333333333333333333');
+
+
+      }
+      // Handle other DioErrors
+      throw error.message.toString();
+    } catch (error) {
+      // Handle other errors
+      throw error.toString();
+    }
+  }
+
+
+  Future<Map<String,dynamic>> downlaodSurah(int surahNumber) async{
+    try{
+
+      print('surah/$surahNumber/ar.asad');
+      final response = await dio().get(
+          'surah/$surahNumber/ar.asad'
+      );
+
+
+      final data = response.data;
+
+      print('downlaodSurah : $data');
+
+      notifyListeners();
+
+      // Vérification et cast
+      if(data != null ){
+        return data;
+      }
+
+      return {
+        "error" : 1 ,
+        "message" : "probleme d api"
+      };
+
+    }on DioError catch (error) {
       if (error.type == DioErrorType && error.error is HandshakeException) {
         // Handle HandshakeException here
 
@@ -124,18 +261,25 @@ class QuranService extends ChangeNotifier {
       }else if (error.response?.statusCode == 403) {
         print('40333333333333333333333333333333333333333333333333333333333333333333');
 
-
+        return {
+          "error" : 1 ,
+          "message" : "probleme d api"
+        };
       }
-      // Handle other DioErrors
-      throw error.message.toString();
+
+      return {
+        "error" : 1 ,
+        "message" : "probleme d api"
+      };
     } catch (error) {
       // Handle other errors
       throw error.toString();
     }
+
   }
 
 
-  Future<Map<String,dynamic>> getAyahDetails(int ayahNum , Map<String , dynamic> surah) async {
+  Future<Map<dynamic,dynamic>> getAyahDetails(int ayahNum , Map<dynamic , dynamic> surah) async {
     String? tajweedAyahId = box.get("tajweedAyahId");
 
     print('getAyahDetails link : ${'ayah/${surah["number"]}:$ayahNum/${tajweedAyahId ?? 'ar.alafasy'}'}');
@@ -207,7 +351,7 @@ class QuranService extends ChangeNotifier {
   }
 
 
-  Future<Map<String,dynamic>> getAyahExplic(int ayahNum , Map<String , dynamic> surah) async {
+  Future<Map<dynamic,dynamic>> getAyahExplic(int ayahNum , Map<dynamic , dynamic> surah) async {
 
     try {
       String? tafsirId = box.get("tafsirId");

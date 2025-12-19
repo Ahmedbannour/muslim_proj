@@ -1,8 +1,10 @@
 import 'dart:io';
 
+import 'package:flutter/foundation.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:hive/hive.dart';
 import 'package:muslim_proj/Constants.dart';
@@ -12,7 +14,7 @@ import 'package:muslim_proj/Widgets/Quran/AudioReader.dart';
 import 'package:provider/provider.dart';
 
 class MushafWidget extends StatefulWidget {
-  final Map<String, dynamic> surah;
+  final Map<dynamic, dynamic> surah;
   final int surahNumber;
   const MushafWidget({super.key, required this.surah, required this.surahNumber});
 
@@ -21,9 +23,9 @@ class MushafWidget extends StatefulWidget {
 }
 
 class _MushafWidgetState extends State<MushafWidget> {
-  late Map<String, dynamic> surah;
+  late Map<dynamic, dynamic> surah;
   late int surahNumber;
-  late Future<Map<String, dynamic>> _getSurahDetails;
+  late Future<Map<dynamic, dynamic>> _getSurahDetails;
   late Future<File> _getSurahAudio;
   final List<TapGestureRecognizer> _tapRecognizers = [];
   var box = Hive.box('muslim_proj');
@@ -36,7 +38,7 @@ class _MushafWidgetState extends State<MushafWidget> {
     super.initState();
     surah = widget.surah;
     surahNumber = widget.surahNumber;
-    _getSurahDetails = getSurahDetails(surahNumber);
+    _getSurahDetails = getSurahDetails(surahNumber , surah);
     tajweedSurahId = box.get("tajweedSurahId");
     // _getSurahAudio = getSurahAudio(surahNumber);
   }
@@ -106,8 +108,8 @@ class _MushafWidgetState extends State<MushafWidget> {
     );
   }
 
-  Future<Map<String, dynamic>> getSurahDetails(int surahNumber) async {
-    return await Provider.of<QuranService>(context, listen: false).getSurahDetails(surahNumber);
+  Future<Map<String, dynamic>> getSurahDetails(int surahNumber , Map<dynamic,dynamic> surah) async {
+    return await Provider.of<QuranService>(context, listen: false).getSurahDetails(surahNumber , surah);
   }
 
 
@@ -171,7 +173,7 @@ class _MushafWidgetState extends State<MushafWidget> {
 
 
       body: SafeArea(
-        child: FutureBuilder<Map<String, dynamic>>(
+        child: FutureBuilder<Map<dynamic, dynamic>>(
           future: _getSurahDetails,
           builder: (context, snapshot) {
             if (snapshot.hasError) {
@@ -181,7 +183,17 @@ class _MushafWidgetState extends State<MushafWidget> {
             }
         
             final quran = snapshot.data!;
-            final surahDetails = quran['data'] as Map<String, dynamic>;
+
+            bool isConnected = true;
+
+            if(quran['error'] != null && quran['error'].toString() == "1"){
+              isConnected = false;
+            }
+
+            print('_getSurahDetails : $quran');
+
+            final surahDetails = quran['data'] as Map<dynamic, dynamic>;
+
             final List<dynamic> ayahsRaw = surahDetails['ayahs'] as List<dynamic>;
         
             // cleaning basmallah & invalid chars
@@ -199,7 +211,7 @@ class _MushafWidgetState extends State<MushafWidget> {
             final List<InlineSpan> spans = [];
         
             for (int i = 0; i < ayahsRaw.length; i++) {
-              final Map<String, dynamic> ay = ayahsRaw[i] as Map<String, dynamic>;
+              final Map<dynamic, dynamic> ay = ayahsRaw[i] as Map<dynamic, dynamic>;
               final int ayahNum = ay['numberInSurah'] is int ? ay['numberInSurah'] as int : int.parse(ay['numberInSurah'].toString());
               // pick text, clean invalid chars
               final String rawText = (i == 0 ? cleanedFirstAyah : ay['text'].toString());
@@ -209,8 +221,15 @@ class _MushafWidgetState extends State<MushafWidget> {
               final recognizer = TapGestureRecognizer()
                 ..onTap = () {
                   // open bottom sheet with ayah
-                  _showAyahSheet(context, ayahNum, text);
-        
+                  if(isConnected){
+                    _showAyahSheet(context, ayahNum, text);
+                  }else{
+                    Fluttertoast.showToast(
+                      msg: 'ce service indisponible dans le mode hors ligne :/',
+                      toastLength: Toast.LENGTH_LONG,
+                    );
+                  }
+
                 };
               _tapRecognizers.add(recognizer);
         
@@ -356,7 +375,41 @@ class _MushafWidgetState extends State<MushafWidget> {
                   bottom: 0,
                   right: 0,
                   left: 0,
-                  child: AudioReader(url: "https://cdn.islamic.network/quran/audio-surah/128/${tajweedSurahId ?? "ar.alafasy"}/$surahNumber.mp3"),
+                  child: isConnected == true ? AudioReader(url: "https://cdn.islamic.network/quran/audio-surah/128/${tajweedSurahId ?? "ar.alafasy"}/$surahNumber.mp3") : Row(
+                    children: [
+                      Expanded(
+                        child: GestureDetector(
+                          onTap: (){
+                            Navigator.pop(context);
+                          },
+                          child: Padding(
+                            padding: const EdgeInsets.all(8.0),
+                            child: AnimatedContainer(
+                              duration: Duration(milliseconds: 200),
+                              decoration: BoxDecoration(
+                                color: KPrimaryColor,
+                                borderRadius: BorderRadius.circular(8)
+                              ),
+                              child: Padding(
+                                padding: const EdgeInsets.all(8.0),
+                                child: Center(
+                                  child: Text(
+                                    'صَدَقَ ٱللّٰهُ ٱلْعَظِيمُ',
+                                    style: TextStyle(
+                                      fontFamily: 'UthmanicHafs',
+                                      fontWeight: FontWeight.bold,
+                                      color: Colors.white,
+                                      fontSize: 26
+                                    ),
+                                  ),
+                                ),
+                              ),
+                            ),
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
 
                   // child: FutureBuilder(
                   //   future: _getSurahAudio,

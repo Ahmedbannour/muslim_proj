@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:hive/hive.dart';
 import 'package:muslim_proj/Constants.dart';
 import 'package:muslim_proj/Services/QuranService.dart';
+import 'package:muslim_proj/Widgets/ErrorApiWidget.dart';
 import 'package:muslim_proj/Widgets/MushafWidget.dart';
 import 'package:provider/provider.dart';
 import 'package:shimmer/shimmer.dart';
@@ -19,10 +21,11 @@ class QuranContent extends StatefulWidget {
 
 class _QuranContentState extends State<QuranContent> {
 
-  late Future<List<Map<String,dynamic>>> quranInfo = getQuranAll();
+  late Future<List<Map<dynamic,dynamic>>> quranInfo = getQuranAll();
 
   late int filterQuranType;
   late var currentPage;
+  var box = Hive.box('muslim_proj');
 
 
   @override
@@ -136,7 +139,8 @@ class _QuranContentState extends State<QuranContent> {
             ],
           ),
         ),
-        
+
+
         
         Expanded(
           child: FutureBuilder(
@@ -147,15 +151,30 @@ class _QuranContentState extends State<QuranContent> {
                 print('error quran : ${snapshot.error}');
                 print('trace quran : ${snapshot.stackTrace}');
                 return Container(
+                  width: 80,
+                  height: 80,
+                  color: Colors.red,
                   child: Text(
                     snapshot.error.toString(),
                   ),
                 );
               }else if (snapshot.hasData){
-                final quran = snapshot.data as List<Map<String, dynamic>>;
+                final quran = snapshot.data as List<Map<dynamic, dynamic>>;
 
                 print("final data : $quran");
+                final List<Map<dynamic, dynamic>> oldQuranList = ((box.get('quranList') ?? []) as List<dynamic>).map((e) => Map<dynamic, dynamic>.from(e)).toList();
 
+
+                if(quran.isNotEmpty && quran[0]['error'] != null && oldQuranList.isEmpty){
+                  return ErrorApiWidget(text: "Probleme de connexion");
+                }else if(oldQuranList.isNotEmpty){
+                  return ListView.builder(
+                    itemCount: oldQuranList.length,
+                    itemBuilder: (context, index) {
+                      return quranItem(oldQuranList[index] , index);
+                    },
+                  );
+                }
                 return ListView.builder(
                   itemCount: quran.length,
                   itemBuilder: (context, index) {
@@ -180,7 +199,7 @@ class _QuranContentState extends State<QuranContent> {
   }
 
 
-  Widget quranItem (Map<String,dynamic> item, int index){
+  Widget quranItem (Map<dynamic,dynamic> item, int index){
     return GestureDetector(
       onTap: ()async{
         await Navigator.push(context, MaterialPageRoute(builder: (context) => MushafWidget(surah: item , surahNumber : index + 1)));
@@ -324,7 +343,7 @@ class _QuranContentState extends State<QuranContent> {
   String twoDigits(int n) => n.toString().padLeft(2, '0');
 
 
-  Future<List<Map<String,dynamic>>>  getQuranAll() async{
+  Future<List<Map<dynamic,dynamic>>> getQuranAll() async{
     return await Provider.of<QuranService>(context , listen: false).getQuranAll();
   }
 

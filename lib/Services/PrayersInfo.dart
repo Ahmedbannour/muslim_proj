@@ -1,96 +1,132 @@
 import 'dart:io';
-
 import 'package:flutter/material.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
-import 'package:muslim_proj/Services/dio.dart';
+import 'package:hive/hive.dart';
 import 'package:dio/dio.dart';
 import 'package:intl/intl.dart';
-
+import 'package:muslim_proj/Constants.dart';
+import 'package:muslim_proj/Services/NotifsService.dart';
 
 class PrayersInfoService extends ChangeNotifier {
+  var box = Hive.box('muslim_proj');
 
-  Future<List<Map<String,dynamic>>> getPrayerInfos(DateTime date , LatLng location) async {
-    String dateFormatted = DateFormat('dd-MM-yyyy', 'fr_FR').format(date);
+  /// Télécharge les prières pour les 7 prochains jours à partir de [today]
+  Future<List<Map<dynamic, dynamic>>> downloadPrayerForWeek(DateTime today, LatLng location) async {
+
+    List<Map<dynamic , dynamic>> todayPrayers = [];
+    for (int i = 0; i < 7; i++) {
+      DateTime nextDate = today.add(Duration(days: i));
+      String formatted = DateFormat('dd-MM-yyyy').format(nextDate);
 
 
+
+      if(i == 0){
+        todayPrayers = await getPrayerByDate(formatted, location);
+      }else{
+        // Télécharge les prières pour cette date
+        await getPrayerByDate(formatted, location);
+      }
+    }
+
+    print('todayPrayers : $todayPrayers');
+    return todayPrayers;
+  }
+
+  /// Récupère les prières pour une date spécifique et les stocke dans Hive
+  Future<List<Map<dynamic, dynamic>>> getPrayerByDate(String date, LatLng location) async {
     try {
-      final response = await Dio().get('http://api.aladhan.com/v1/timings/$dateFormatted',
+      final response = await Dio().get('http://api.aladhan.com/v1/timings/$date',
         queryParameters: {
           "latitude": location.latitude,
           "longitude": location.longitude,
-          "method": 3,
+          "method": 18,
         },
       );
 
-      print('response : ${response.data['data']['timings']} ');
+      List<Map<dynamic, dynamic>> timings = [];
 
-      List<Map<String,dynamic>> timings = [];
+      if (response.data != null && response.data['data'] != null && response.data['data']['timings'] != null) {
+        Map<String, dynamic> tt = response.data['data']['timings'];
 
-      if(response.data != null && response.data['data'] != null && response.data['data']['timings'] != null){
-        Map<String,dynamic> tt = response.data['data']['timings'];
+        tt.forEach((key, value) {
+          Map<String, dynamic> elem = {"label": key, "time": value};
 
-        tt.forEach((key , value){
-          Map<String,dynamic> elem = {
-            "label" : key,
-            "time" : value,
-          };
-
-          if(key == "Fajr"){
+          if (key == "Fajr") {
             elem['icon'] = "cloud-sun";
-          }else if(key == "Dhuhr"){
+          } else if (key == "Dhuhr") {
             elem['icon'] = "brightness";
-          }else if(key == "Asr"){
+          } else if (key == "Asr") {
             elem['icon'] = "cloud-sun";
-          }else if(key == "Maghrib"){
+          } else if (key == "Maghrib") {
             elem['icon'] = "moon";
-          }else if(key == "Isha"){
+          } else if (key == "Isha") {
             elem['icon'] = "moon-stars";
           }
           timings.add(elem);
         });
 
+
+        await schedulePrayerNotifications(
+          Map<String, String>.from(tt),
+        );
+        // Met à jour Hive
+        Map<dynamic, dynamic> oldPrayersDate = Map<dynamic, dynamic>.from(box.get('prayersListsByDate') ?? {});
+        oldPrayersDate[date] = timings;
+        box.put('prayersListsByDate', oldPrayersDate);
+
         return timings;
       }
 
-      var res = response.data;
-
-      notifyListeners();
-      print('res : ${res}');
-      return res;
-    } on DioError catch (error) {
-      if (error.type == DioErrorType && error.error is HandshakeException) {
-        // Handle HandshakeException here
-
-
-        return [];
-      } else if (error.error is HttpException) {
-        HttpException httpException = error.error as HttpException;
-        if (httpException.message == 'Connection closed before full header was received') {
-
-
-
-          return [];
+      return [
+        {
+          "error" : "no data found",
+          "message" : "probleme de connexion"
         }
-      }else if (error.type == DioErrorType.receiveTimeout || error.error is SocketException) {
-        // Handle the timeout error here
+      ];
+    } on DioError catch (error) {
+      // En cas d'erreur réseau, on retourne les données existantes dans Hive
 
-
-        return [];
-      }else if (error.response?.statusCode == 403) {
-        print('40333333333333333333333333333333333333333333333333333333333333333333');
-
-
-
-        // Handle 403 Forbidden error here
-        // You can add your specific handling for this error, if needed
-      }
-      // Handle other DioErrors
-      throw error.message.toString();
+      return [
+        {
+          "error" : error.type,
+          "message" : error.message
+        }
+      ];
     } catch (error) {
-      // Handle other errors
-      throw error.toString();
+      // Autres erreurs
+      return [
+        {
+          "error" : error,
+          "message" : null
+        }
+      ];
+    }
+  }
+
+
+  Future<void> schedulePrayerNotifications(Map<String, String> timings) async {
+    final prayers = {
+      "Fajr": timings["Fajr"],
+      "Dhuhr": timings["Dhuhr"],
+      "Asr": timings["Asr"],
+      "Maghrib": timings["Maghrib"],
+      "Isha": timings["Isha"],
+    };
+
+    int id = 1;
+
+    for (final entry in prayers.entries) {
+      if (entry.value == null) continue;
+
+      final dateTime = prayerDateTime(entry.value!);
+
+      await NotifsService.schedule(
+        id: id++,
+        title: "🕌 ${entry.key} Prayer",
+        body: "It’s time for ${entry.key} prayer",
+        dateTime: dateTime,
+      );
     }
   }
 
 }
-

@@ -1,7 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:muslim_proj/Widgets/Home/CoverWidget.dart';
-import 'package:muslim_proj/Widgets/Home/MenuWidget.dart';
-import 'package:muslim_proj/Widgets/Home/PrayerWidget.dart';
 import 'package:muslim_proj/Widgets/Quran/QuranBanner.dart';
 import 'package:muslim_proj/Widgets/Quran/QuranContent.dart';
 
@@ -12,6 +9,7 @@ class QuranWidget extends StatefulWidget {
   @override
   State<QuranWidget> createState() => _QuranWidgetState();
 }
+
 
 class _QuranWidgetState extends State<QuranWidget> {
   @override

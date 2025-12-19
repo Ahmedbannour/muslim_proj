@@ -6,6 +6,8 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:hive/hive.dart';
 import 'package:muslim_proj/Constants.dart';
 import 'package:muslim_proj/Services/ConfigService.dart';
+import 'package:muslim_proj/Services/NotifsService.dart';
+import 'package:muslim_proj/Widgets/HorsLigneConfig.dart';
 import 'package:provider/provider.dart';
 import 'package:shimmer/shimmer.dart';
 
@@ -180,14 +182,10 @@ class _ConfigWidgetState extends State<ConfigWidget> {
       oldNotifStatus = true;
     }
 
-    isNotifActive = box.get("notifSatus");
+    isNotifActive = box.get("notifSatus") ?? false;
     tafsirId = box.get("tafsirId");
     tajweedSurahId = box.get("tajweedSurahId");
     tajweedAyahId = box.get("tajweedAyahId");
-
-    print('taffsir : $tafsirId');
-    print('tajweedAyahId : $tajweedAyahId');
-    print('tajweedSurahId : $tajweedSurahId');
 
   }
 
@@ -1031,6 +1029,66 @@ class _ConfigWidgetState extends State<ConfigWidget> {
                         ),
                       ),
                     ],
+                  ),
+                ),
+
+                SizedBox(height: 16),
+
+                Row(
+                  children: [
+                    Expanded(
+                      child: GestureDetector(
+                        onTap: ()async{
+                          await Navigator.push(context, MaterialPageRoute(builder: (context) => HorsLigneConfig()));
+                        },
+                        child: AnimatedContainer(
+                          duration: Duration(milliseconds: 200),
+                          decoration: BoxDecoration(
+                            color: KPrimaryColor,
+                            borderRadius: BorderRadius.circular(16)
+                          ),
+                          child: Padding(
+                            padding: EdgeInsets.all(16),
+                            child: Center(
+                              child: Text(
+                                'Mode hors ligne',
+                                style: GoogleFonts.beVietnamPro(
+                                  fontWeight: FontWeight.bold,
+                                  color: Colors.white
+                                ),
+                              ),
+                            ),
+                          ),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+                SizedBox(height: 16),
+
+                GestureDetector(
+                  onTap: (){
+                    NotifsService().showNotification(
+                      title: 'prayer Notif',
+                      body: 'prayer notif cchannel',
+                    );
+                  },
+                  child: AnimatedContainer(
+                    duration: Duration(milliseconds: 200),
+                    decoration: BoxDecoration(
+                      color: KPrimaryColor,
+                      borderRadius: BorderRadius.circular(16)
+                    ),
+                    child: Padding(
+                      padding: EdgeInsets.all(16),
+                      child: Text(
+                        'show notificaition',
+                        style: GoogleFonts.beVietnamPro(
+                          fontWeight: FontWeight.bold,
+                          color: Colors.white
+                        ),
+                      ),
+                    ),
                   ),
                 ),
               ],

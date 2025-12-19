@@ -13,6 +13,15 @@
     <!-- Pour Android < 13 -->
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
 
+
+    <!-- >notification -->
+    <uses-permission android:name="android.permission.SCHEDULE_EXACT_ALARM" />
+    <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED"/>
+    <uses-permission android:name="android.permission.USE_FULL_SCREEN_INTENT" />
+
+    <!--> background service -->
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE"/>
+
     <application
         android:label="muslim_proj"
         android:name="${applicationName}"
