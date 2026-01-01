@@ -12,16 +12,16 @@ const kFontColor = Color(0xFFa8a8a9);
 const kDefaultPadding = 20.0;
 
 
-DateTime prayerDateTime(String time) {
-  final now = DateTime.now();
-  final parts = time.split(':');
+DateTime prayerDateTime(String date, String time) {
+  final dateParts = date.split('-'); // yyyy-MM-dd
+  final timeParts = time.split(':'); // HH:mm
 
   return DateTime(
-    now.year,
-    now.month,
-    now.day,
-    int.parse(parts[0]),
-    int.parse(parts[1]),
+    int.parse(dateParts[2]), // year
+    int.parse(dateParts[1]), // month
+    int.parse(dateParts[0]), // day
+    int.parse(timeParts[0]), // hour
+    int.parse(timeParts[1]), // minute
   );
 }
 

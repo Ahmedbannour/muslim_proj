@@ -66,8 +66,10 @@ class PrayersInfoService extends ChangeNotifier {
         });
 
 
+
         await schedulePrayerNotifications(
           Map<String, String>.from(tt),
+          date
         );
         // Met à jour Hive
         Map<dynamic, dynamic> oldPrayersDate = Map<dynamic, dynamic>.from(box.get('prayersListsByDate') ?? {});
@@ -104,7 +106,7 @@ class PrayersInfoService extends ChangeNotifier {
   }
 
 
-  Future<void> schedulePrayerNotifications(Map<String, String> timings) async {
+  Future<void> schedulePrayerNotifications(Map<String, String> timings , String date) async {
     final prayers = {
       "Fajr": timings["Fajr"],
       "Dhuhr": timings["Dhuhr"],
@@ -118,7 +120,7 @@ class PrayersInfoService extends ChangeNotifier {
     for (final entry in prayers.entries) {
       if (entry.value == null) continue;
 
-      final dateTime = prayerDateTime(entry.value!);
+      final dateTime = prayerDateTime(date , entry.value!);
 
       await NotifsService.schedule(
         id: id++,
@@ -126,6 +128,8 @@ class PrayersInfoService extends ChangeNotifier {
         body: "It’s time for ${entry.key} prayer",
         dateTime: dateTime,
       );
+
+      print('prayer added on $date , $dateTime');
     }
   }
 

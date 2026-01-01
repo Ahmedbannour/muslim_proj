@@ -10,35 +10,42 @@ import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:provider/provider.dart';
 import 'package:workmanager/workmanager.dart';
 
-import 'background_tasks.dart';
+import 'package:timezone/data/latest.dart' as tz;
+import 'package:timezone/timezone.dart' as tz;
+import 'package:flutter_timezone/flutter_timezone.dart';
 
 
-void main() async{
-  print('hello planning');
+
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized(); // ⚡ TOUJOURS en premier
+
+  // Initialize Hive
   await Hive.initFlutter();
   await Hive.openBox('muslim_proj');
-  var box =  Hive.box('muslim_proj');
-  WidgetsFlutterBinding.ensureInitialized();
 
-  await Workmanager().initialize(
-    callbackDispatcher,
-    isInDebugMode: false,
-  );
 
-  await Workmanager().registerPeriodicTask(
-    "prayer_task_id",
-    prayerTask,
-    frequency: const Duration(hours: 24),
-    initialDelay: const Duration(minutes: 1),
-    constraints: Constraints(
-      networkType: NetworkType.not_required,
-    ),
-  );
-  // initialize notification
+  // Initialize notifications
   await NotifsService().initializeNotification();
-  await NotifsService().requestPermissions();  // 🔥 obligatoire Android 13+
+  await NotifsService().requestPermissions();  // Android 13+
+
+  // Initialize timezone
+  await initializeTimeZone();  // ⚡ CRUCIAL
+
   runApp(const MyApp());
 }
+
+
+
+Future<void> initializeTimeZone() async {
+  tz.initializeTimeZones();
+
+  // Récupère le nom du fuseau horaire local (ex: "Europe/Paris")
+  final String timeZoneName = await FlutterTimezone.getLocalTimezone();
+
+  // Initialise tz avec ce fuseau horaire
+  tz.setLocalLocation(tz.getLocation(timeZoneName));
+}
+
 
 class MyApp extends StatelessWidget {
   const MyApp({super.key});

@@ -1,4 +1,5 @@
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
+import 'package:hive/hive.dart';
 import 'package:timezone/timezone.dart' as tz;
 
 
@@ -75,17 +76,35 @@ class NotifsService {
   }) async {
     if (dateTime.isBefore(DateTime.now())) return;
 
+    final box = Hive.box('muslim_proj');
+
+    /// 🎵 Son par défaut
+    String notifSong = "tounsi_ali_burak";
+
+    if (box.get('adhanAuteurId') != null) {
+      notifSong = box.get('adhanAuteurId');
+    }
+
+    /// 🔥 CHANNEL DYNAMIQUE (IMPORTANT)
+    final String channelId = 'adhan_channel_$notifSong';
+
     await notificationsPlugin.zonedSchedule(
       id,
       title,
       body,
       tz.TZDateTime.from(dateTime, tz.local),
-      const NotificationDetails(
+      NotificationDetails(
         android: AndroidNotificationDetails(
-          'prayers_channel',
-          'Prayer Times',
-          importance: Importance.high,
+          channelId,
+          'Prayer Adhan',
+          channelDescription: 'Adhan sound notification',
+          importance: Importance.max,
           priority: Priority.high,
+          playSound: true,
+          enableVibration: true,
+          sound: RawResourceAndroidNotificationSound(
+            notifSong, // 🔥 DYNAMIQUE
+          ),
         ),
       ),
       androidScheduleMode: AndroidScheduleMode.exactAllowWhileIdle,
@@ -96,50 +115,6 @@ class NotifsService {
   }
 
 
-
-  Future<void> schedulePrayerNotifications(
-      Map<String, String> timings) async {
-    final prayers = ['Fajr', 'Dhuhr', 'Asr', 'Maghrib', 'Isha'];
-
-    int id = 100; // éviter conflit d’ID
-
-    for (final p in prayers) {
-      final time = timings[p];
-      if (time == null) continue;
-
-      final parts = time.split(':');
-      final now = DateTime.now();
-
-      final dt = DateTime(
-        now.year,
-        now.month,
-        now.day,
-        int.parse(parts[0]),
-        int.parse(parts[1]),
-      );
-
-      if (dt.isAfter(DateTime.now())) {
-        await notificationsPlugin.zonedSchedule(
-          id++,
-          '🕌 $p Prayer',
-          'It’s time for $p prayer',
-          tz.TZDateTime.from(dt, tz.local),
-          const NotificationDetails(
-            android: AndroidNotificationDetails(
-              'prayer_channel',
-              'Prayer Notifications',
-              importance: Importance.high,
-              priority: Priority.high,
-            ),
-          ),
-          androidScheduleMode:
-          AndroidScheduleMode.exactAllowWhileIdle,
-          uiLocalNotificationDateInterpretation:
-          UILocalNotificationDateInterpretation.absoluteTime,
-        );
-      }
-    }
-  }
 
   Future<void> cancelAll() async {
     await notificationsPlugin.cancelAll();
