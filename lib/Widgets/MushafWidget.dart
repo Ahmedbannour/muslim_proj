@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:io';
 
 import 'package:flutter/foundation.dart';
@@ -10,6 +11,7 @@ import 'package:hive/hive.dart';
 import 'package:muslim_proj/Constants.dart';
 import 'package:muslim_proj/Services/QuranService.dart';
 import 'package:muslim_proj/Widgets/AyahDetails.dart';
+import 'package:muslim_proj/Widgets/Configuration/ScrollConfig.dart';
 import 'package:muslim_proj/Widgets/Quran/AudioReader.dart';
 import 'package:provider/provider.dart';
 
@@ -31,7 +33,60 @@ class _MushafWidgetState extends State<MushafWidget> {
   var box = Hive.box('muslim_proj');
 
   String? tajweedSurahId;
+  bool _isAutoScrolling = false;
 
+
+  final ScrollController _controller = ScrollController();
+
+  Timer? _autoScrollTimer;
+  Timer? _resumeTimer;
+
+  bool _userScrolling = false;
+  late double _speed;
+
+
+  void _startAutoScroll() {
+    _autoScrollTimer?.cancel();
+
+    _autoScrollTimer = Timer.periodic(
+      const Duration(milliseconds: 16),
+          (timer) {
+        if (!_controller.hasClients) return;
+        if (_userScrolling) return;
+
+        final maxScroll = _controller.position.maxScrollExtent;
+        final current = _controller.offset;
+
+        if (current >= maxScroll) {
+          timer.cancel();
+        } else {
+          _controller.jumpTo(current + _speed);
+        }
+      },
+    );
+  }
+
+  void _onUserScroll() {
+    _userScrolling = true;
+
+    _resumeTimer?.cancel();
+    _resumeTimer = Timer(const Duration(seconds: 2), () {
+      _userScrolling = false;
+    });
+  }
+
+  double getScrollSpeed(int level) {
+    switch (level) {
+      case 1:
+        return 0.5;
+      case 2:
+        return 1.2;
+      case 3:
+        return 2.5;
+      default:
+        return 0.5;
+    }
+  }
 
   @override
   void initState() {
@@ -41,6 +96,13 @@ class _MushafWidgetState extends State<MushafWidget> {
     _getSurahDetails = getSurahDetails(surahNumber , surah);
     tajweedSurahId = box.get("tajweedSurahId");
     // _getSurahAudio = getSurahAudio(surahNumber);
+
+    int scrollValue = box.get('scrollValue', defaultValue: 1);
+    _speed = getScrollSpeed(scrollValue);
+
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _startAutoScroll();
+    });
   }
 
   @override
@@ -56,6 +118,9 @@ class _MushafWidgetState extends State<MushafWidget> {
       r.dispose();
     }
     _tapRecognizers.clear();
+    _autoScrollTimer?.cancel();
+    _resumeTimer?.cancel();
+    _controller.dispose();
     super.dispose();
   }
 
@@ -157,20 +222,91 @@ class _MushafWidgetState extends State<MushafWidget> {
         ),
         title: Text(
           "Quran",
-          style: GoogleFonts.beVietnamPro(color: Colors.black, fontWeight: FontWeight.bold),
+          style: GoogleFonts.beVietnamPro(
+              color: Colors.black,
+              fontWeight: FontWeight.bold
+          ),
         ),
         actions: <Widget>[
           Container(
             margin: const EdgeInsets.only(right: 12),
             decoration: BoxDecoration(shape: BoxShape.circle, color: KPrimaryColor.withOpacity(0.05)),
             child: IconButton(
-              icon: const Icon(Icons.logout_outlined, color: KPrimaryColor),
-              onPressed: () {},
+              icon: const Icon(
+                  Icons.swipe_vertical_outlined,
+                  color: KPrimaryColor
+              ),
+              onPressed: () {
+                showDialog(
+                    context: context,
+                    barrierColor: KPrimaryColor.withOpacity(0.2),
+                    builder: (BuildContext context) =>
+                        AlertDialog(
+                            titlePadding: EdgeInsets.all(0),
+                            surfaceTintColor: KBackgroundColor.withOpacity(0.2),
+                            backgroundColor: KBackgroundColor,
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(16.0),
+                            ),
+                            title: Container(
+                              decoration: BoxDecoration(
+                                  color: KPrimaryColor,
+                                  borderRadius: BorderRadius.only(
+                                      topRight: Radius.circular(16),
+                                      topLeft: Radius.circular(16)
+                                  )
+                              ),
+                              child: Padding(
+                                padding: EdgeInsets.all(16),
+                                child: Row(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  crossAxisAlignment: CrossAxisAlignment.end,
+                                  children: [
+
+                                    Icon(
+                                      Icons.swipe_vertical_outlined,
+                                      color: KBackgroundColor,
+                                    ),
+
+                                    SizedBox(
+                                      width: 8,
+                                    ),
+
+                                    Expanded(
+                                      child: Text(
+                                        'Confirmation',
+                                        style: GoogleFonts.beVietnamPro(
+                                          fontWeight: FontWeight.w600,
+                                          color: Colors.white,
+                                          fontSize: 22
+                                        ),
+                                        textAlign: TextAlign.center,
+                                      ),
+                                    ),
+
+                                    SizedBox(width: 8),
+
+                                    GestureDetector(
+                                      onTap: (){
+                                        Navigator.pop(context);
+                                      },
+                                      child: Icon(
+                                        Icons.close,
+                                        color: KBackgroundColor,
+                                      ),
+                                    )
+                                  ],
+                                ),
+                              ),
+                            ),
+                            content: ScrollConfig()
+                        )
+                );
+              },
             ),
           )
         ],
       ),
-
 
       body: SafeArea(
         child: FutureBuilder<Map<dynamic, dynamic>>(
@@ -285,90 +421,106 @@ class _MushafWidgetState extends State<MushafWidget> {
                   right: 0,
                   left: 0,
                   bottom: 80,
-                  child: ListView(
-                    padding: const EdgeInsets.all(16),
-                    children: [
-                      // header card
-                      AnimatedContainer(
-                        duration: const Duration(milliseconds: 200),
-                        decoration: BoxDecoration(color: KPrimaryColor.withOpacity(.05), borderRadius: BorderRadius.circular(16)),
-                        padding: const EdgeInsets.all(24),
-                        child: Column(
-                          children: [
-                            const SizedBox(height: 8),
-                            Text(
-                              surah['englishName'] ?? '',
-                              style: GoogleFonts.beVietnamPro(fontWeight: FontWeight.bold, fontSize: 28, color: KPrimaryColor),
-                            ),
-                            const SizedBox(height: 8),
-                            Row(
-                              mainAxisAlignment: MainAxisAlignment.center,
+                  child: NotificationListener<ScrollNotification>(
+                    onNotification: (notification) {
+                      if (notification is UserScrollNotification ||
+                          notification is ScrollUpdateNotification) {
+                        _onUserScroll();
+                      }
+                      return false;
+                    },
+                    child: ListView(
+                      controller: _controller,
+                      padding: const EdgeInsets.all(16),
+                      children: [
+                        // header card
+                        GestureDetector(
+                          onTap: (){
+                            print('auto scroll : ${box.get('scrollValue')}');
+                            _startAutoScroll();
+                          },
+                          child: AnimatedContainer(
+                            duration: const Duration(milliseconds: 200),
+                            decoration: BoxDecoration(color: KPrimaryColor.withOpacity(.05), borderRadius: BorderRadius.circular(16)),
+                            padding: const EdgeInsets.all(24),
+                            child: Column(
                               children: [
-        
+                                const SizedBox(height: 8),
                                 Text(
-                                  surah['englishNameTranslation'],
-                                  style: GoogleFonts.beVietnamPro(
-                                      color: Colors.black45,
-                                      fontWeight: FontWeight.w400
-                                  ),
+                                  surah['englishName'] ?? '',
+                                  style: GoogleFonts.beVietnamPro(fontWeight: FontWeight.bold, fontSize: 28, color: KPrimaryColor),
                                 ),
-        
-                                SizedBox(width: 8),
-        
-                                Container(
-                                  height: 6,
-                                  width: 6,
-                                  decoration: BoxDecoration(
-                                      color: Color(0xf736000000),
-                                      shape: BoxShape.circle
-                                  ),
+                                const SizedBox(height: 8),
+                                Row(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  children: [
+                    
+                                    Text(
+                                      surah['englishNameTranslation'],
+                                      style: GoogleFonts.beVietnamPro(
+                                          color: Colors.black45,
+                                          fontWeight: FontWeight.w400
+                                      ),
+                                    ),
+                    
+                                    SizedBox(width: 8),
+                    
+                                    Container(
+                                      height: 6,
+                                      width: 6,
+                                      decoration: BoxDecoration(
+                                          color: Color(0xf736000000),
+                                          shape: BoxShape.circle
+                                      ),
+                                    ),
+                    
+                    
+                                    SizedBox(width: 8),
+                                    Text(
+                                      "${surah['numberOfAyahs']} Ayahs",
+                                      style: GoogleFonts.beVietnamPro(
+                                          color: Colors.black45,
+                                          fontWeight: FontWeight.w400
+                                      ),
+                                    )
+                                  ],
                                 ),
-        
-        
-                                SizedBox(width: 8),
-                                Text(
-                                  "${surah['numberOfAyahs']} Ayahs",
-                                  style: GoogleFonts.beVietnamPro(
-                                      color: Colors.black45,
-                                      fontWeight: FontWeight.w400
+                    
+                                const SizedBox(height: 12),
+                                if (onlyBasmallah.isNotEmpty)
+                                  Padding(
+                                    padding: const EdgeInsets.symmetric(vertical: 8.0),
+                                    child: Text(
+                                      onlyBasmallah,
+                                      textDirection: TextDirection.rtl,
+                                      style: TextStyle(
+                                          fontFamily: 'HafsNastaleeq_Ver10',
+                                          fontSize: baseFont * 1.4,
+                                          fontWeight: FontWeight.bold,
+                                          color: KPrimaryColor
+                                      ),
+                                    ),
                                   ),
-                                )
                               ],
                             ),
-        
-                            const SizedBox(height: 12),
-                            if (onlyBasmallah.isNotEmpty)
-                              Padding(
-                                padding: const EdgeInsets.symmetric(vertical: 8.0),
-                                child: Text(
-                                  onlyBasmallah,
-                                  textDirection: TextDirection.rtl,
-                                  style: TextStyle(
-                                      fontFamily: 'HafsNastaleeq_Ver10',
-                                      fontSize: baseFont * 1.4,
-                                      fontWeight: FontWeight.bold,
-                                      color: KPrimaryColor
-                                  ),
-                                ),
-                              ),
-                          ],
+                          ),
                         ),
-                      ),
-        
-                      const SizedBox(height: 18),
-        
-                      // the mushaf text (single Text.rich)
-                      Directionality(
-                        textDirection: TextDirection.rtl,
-                        child: Text.rich(
-                          TextSpan(children: spans),
-                          textAlign: TextAlign.justify,
+                            
+                        const SizedBox(height: 18),
+                            
+                        // the mushaf text (single Text.rich)
+                        Directionality(
+                          textDirection: TextDirection.rtl,
+                          child: Text.rich(
+                            TextSpan(children: spans),
+                            textAlign: TextAlign.justify,
+                          ),
                         ),
-                      ),
-        
-                      // spacing so bottom button doesn't overlap content
-                      SizedBox(height: media.height * 0.12),
-                    ],
+                            
+                        // spacing so bottom button doesn't overlap content
+                        SizedBox(height: media.height * 0.12),
+                      ],
+                    ),
                   ),
                 ),
                 Positioned(
@@ -410,21 +562,6 @@ class _MushafWidgetState extends State<MushafWidget> {
                       ),
                     ],
                   ),
-
-                  // child: FutureBuilder(
-                  //   future: _getSurahAudio,
-                  //   builder: (context , snapshot) {
-                  //     if(snapshot.hasError){
-                  //       return Center(child: Text('Error: ${snapshot.error}'));
-                  //     }else if(snapshot.hasData){
-                  //       return AudioReader(url: "https://cdn.islamic.network/quran/audio-surah/128/ar.alafasy/$surahNumber.mp3");
-                  //     }
-                  //
-                  //     return Center(
-                  //       child: CircularProgressIndicator(),
-                  //     );
-                  //   }
-                  // ),
                 )
               ],
             );
@@ -433,4 +570,21 @@ class _MushafWidgetState extends State<MushafWidget> {
       ),
     );
   }
+  Duration durationFromScrollValue(int value) {
+    switch (value) {
+      case 1: // lent
+        return const Duration(milliseconds: 40);
+      case 2: // normal
+        return const Duration(milliseconds: 25);
+      case 3: // rapide
+        return const Duration(milliseconds: 12);
+      default:
+        return const Duration(milliseconds: 25);
+    }
+  }
+
+
 }
+
+enum ScrollSpeed { slow, normal, fast }
+

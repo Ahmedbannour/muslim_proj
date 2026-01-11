@@ -178,6 +178,7 @@ class _ConfigWidgetState extends State<ConfigWidget> {
   String? _playingValue;
 
   bool isNotifActive = false;
+  bool autoScroll = false;
   var box = Hive.box('muslim_proj');
 
 
@@ -228,6 +229,7 @@ class _ConfigWidgetState extends State<ConfigWidget> {
     }
 
     isNotifActive = box.get("notifSatus") ?? false;
+    autoScroll = box.get("autoScroll") ?? false;
     tafsirId = box.get("tafsirId");
     tajweedSurahId = box.get("tajweedSurahId");
     tajweedAyahId = box.get("tajweedAyahId");
@@ -303,6 +305,7 @@ class _ConfigWidgetState extends State<ConfigWidget> {
               child: Column(
                 children: [
 
+                  // Notification Config
                   AnimatedContainer(
                     duration: Duration(milliseconds: 200),
                     decoration: BoxDecoration(
@@ -403,6 +406,108 @@ class _ConfigWidgetState extends State<ConfigWidget> {
 
                   SizedBox(height: 16),
 
+                  // AutoScroll Config
+                  AnimatedContainer(
+                    duration: Duration(milliseconds: 200),
+                    decoration: BoxDecoration(
+                        color: KPrimaryColor.withOpacity(.08),
+                        borderRadius: BorderRadius.circular(16)
+                    ),
+
+                    child: Row(
+                      children: [
+                        Expanded(
+                          child: Padding(
+                            padding: EdgeInsets.all(16),
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                Text(
+                                  'Auto Scroll',
+                                  style: GoogleFonts.beVietnamPro(
+                                    fontWeight: FontWeight.bold,
+                                    fontSize: 16,
+                                    color: Colors.grey,
+                                  ),
+                                ),
+
+
+                                AnimatedContainer(
+                                  duration: Duration(milliseconds: 200),
+                                  decoration: BoxDecoration(
+                                      color: KPrimaryColor.withOpacity(.2),
+                                      borderRadius: BorderRadius.circular(8)
+                                  ),
+                                  clipBehavior: Clip.antiAliasWithSaveLayer,
+                                  child: Row(
+                                    children: [
+                                      GestureDetector(
+                                        onTap: (){
+                                          setState(() {
+                                            autoScroll = true;
+                                            box.put("autoScroll", autoScroll);
+                                          });
+                                        },
+                                        child: AnimatedContainer(
+                                          duration: Duration(milliseconds: 200),
+                                          decoration: BoxDecoration(
+                                              borderRadius: BorderRadius.circular(8),
+                                              color: autoScroll ? KPrimaryColor : Colors.transparent
+                                          ),
+                                          width: 40,
+                                          child: Padding(
+                                            padding: const EdgeInsets.all(8.0),
+                                            child: Text(
+                                              'ON',
+                                              style: GoogleFonts.beVietnamPro(
+                                                  color: autoScroll ? Colors.white :  KPrimaryColor,
+                                                  fontWeight: autoScroll ? FontWeight.w600 : FontWeight.w500
+                                              ),
+                                            ),
+                                          ),
+                                        ),
+                                      ),
+                                      SizedBox(width: 2),
+                                      GestureDetector(
+                                        onTap: (){
+                                          setState(() {
+                                            autoScroll = false;
+                                            box.put("autoScroll", autoScroll);
+                                          });
+
+                                        },
+                                        child: AnimatedContainer(
+                                          duration: Duration(milliseconds: 200),
+                                          decoration: BoxDecoration(
+                                              color: !autoScroll ? KPrimaryColor.withOpacity(.8) : Colors.transparent,
+                                              borderRadius: BorderRadius.circular(8)
+                                          ),
+                                          child: Padding(
+                                            padding: const EdgeInsets.all(8.0),
+                                            child: Text(
+                                              'OFF',
+                                              style: GoogleFonts.beVietnamPro(
+                                                  color: !autoScroll ? Colors.white : KPrimaryColor,
+                                                  fontWeight: !autoScroll ? FontWeight.w600 : FontWeight.w500
+                                              ),
+                                            ),
+                                          ),
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                )
+                              ],
+                            ),
+                          ),
+                        )
+                      ],
+                    ),
+                  ),
+
+                  SizedBox(height: 16),
+
+                  // Tafsir Config
                   AnimatedContainer(
                     duration: Duration(milliseconds: 200),
                     decoration: BoxDecoration(
@@ -646,6 +751,7 @@ class _ConfigWidgetState extends State<ConfigWidget> {
                   SizedBox(height: 16),
 
 
+                  // Surah Configuration
                   AnimatedContainer(
                     duration: Duration(milliseconds: 200),
                     decoration: BoxDecoration(
@@ -845,6 +951,7 @@ class _ConfigWidgetState extends State<ConfigWidget> {
                   SizedBox(height: 16),
 
 
+                  // Ayah Configuration
                   AnimatedContainer(
                     duration: Duration(milliseconds: 200),
                     decoration: BoxDecoration(
@@ -1086,12 +1193,11 @@ class _ConfigWidgetState extends State<ConfigWidget> {
                     ),
                   ),
 
-                  SizedBox(height: 16),
-
 
                   SizedBox(height: 16),
 
 
+                  // Adhan Configuration
                   Row(
                     children: [
                       Expanded(
@@ -1128,6 +1234,7 @@ class _ConfigWidgetState extends State<ConfigWidget> {
 
                   SizedBox(height: 16),
 
+                  // mode hors ligne
                   Row(
                     children: [
                       Expanded(
@@ -1159,45 +1266,45 @@ class _ConfigWidgetState extends State<ConfigWidget> {
                       ),
                     ],
                   ),
-
-                  SizedBox(height: 16),
-
-                  Row(
-                    children: [
-                      Expanded(
-                        child: GestureDetector(
-                          onTap: ()async{
-                            NotifsService.schedule(
-                              title: 'prayer Notif',
-                              body: 'prayer notif cchannel',
-                              id: 0,
-                              dateTime: DateTime.now().add(Duration(minutes: 1)),
-                            );
-                          },
-                          child: AnimatedContainer(
-                            duration: Duration(milliseconds: 200),
-                            decoration: BoxDecoration(
-                                color: KPrimaryColor,
-                                borderRadius: BorderRadius.circular(16)
-                            ),
-                            child: Padding(
-                              padding: EdgeInsets.all(16),
-                              child: Center(
-                                child: Text(
-                                  'Test notifications',
-                                  style: GoogleFonts.beVietnamPro(
-                                      fontWeight: FontWeight.bold,
-                                      fontSize: 18,
-                                      color: Colors.white
-                                  ),
-                                ),
-                              ),
-                            ),
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
+                  //
+                  // SizedBox(height: 16),
+                  //
+                  // Row(
+                  //   children: [
+                  //     Expanded(
+                  //       child: GestureDetector(
+                  //         onTap: ()async{
+                  //           NotifsService.schedule(
+                  //             title: 'prayer Notif',
+                  //             body: 'prayer notif cchannel',
+                  //             id: 0,
+                  //             dateTime: DateTime.now().add(Duration(minutes: 1)),
+                  //           );
+                  //         },
+                  //         child: AnimatedContainer(
+                  //           duration: Duration(milliseconds: 200),
+                  //           decoration: BoxDecoration(
+                  //               color: KPrimaryColor,
+                  //               borderRadius: BorderRadius.circular(16)
+                  //           ),
+                  //           child: Padding(
+                  //             padding: EdgeInsets.all(16),
+                  //             child: Center(
+                  //               child: Text(
+                  //                 'Test notifications',
+                  //                 style: GoogleFonts.beVietnamPro(
+                  //                     fontWeight: FontWeight.bold,
+                  //                     fontSize: 18,
+                  //                     color: Colors.white
+                  //                 ),
+                  //               ),
+                  //             ),
+                  //           ),
+                  //         ),
+                  //       ),
+                  //     ),
+                  //   ],
+                  // ),
 
                 ],
               ),

@@ -80,37 +80,7 @@ class _DashboardWidgetState extends State<DashboardWidget> {
               left: 0,
               child: Padding(
                 padding: EdgeInsets.symmetric(horizontal: 16),
-                child: _title == "Calendrier" ? Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  crossAxisAlignment: CrossAxisAlignment.end,
-                  children: [
-                    Text(
-                      _title.toUpperCase(),
-                      style: GoogleFonts.beVietnamPro(
-                          fontSize: 22,
-                          fontWeight: FontWeight.w500
-                      ),
-                    ),
-
-                    GestureDetector(
-                      onTap: (){
-                        print('open search');
-                      },
-                      child: AnimatedContainer(
-                        duration: Duration(milliseconds: 200),
-                        height: 40,
-                        width: 40,
-                        child: Padding(
-                          padding: const EdgeInsets.all(8.0),
-                          child: SvgPicture.asset(
-                            "assets/icons/search.svg",
-                            fit: BoxFit.contain,
-                          ),
-                        ),
-                      ),
-                    ),
-                  ],
-                ) :  Row(
+                child: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   crossAxisAlignment: CrossAxisAlignment.end,
                   children: [
