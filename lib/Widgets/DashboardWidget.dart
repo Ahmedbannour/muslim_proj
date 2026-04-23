@@ -45,32 +45,29 @@ class _DashboardWidgetState extends State<DashboardWidget> {
             Positioned(
               top: 0,
               right: 0,
-              bottom: 60,
+              bottom: itemSalected != 4 ? 60 : 80,
               left: 0,
               child: _container,
             ),
 
+            // Dans build de DashboardWidget
             Positioned(
-              bottom: 0,
-              right: 0,
-              left: 0,
-              child: Container(
-                height: 60,
-                child: DashboardMenu(
-                  itemSalected : itemSalected,
-                  updateContainer: (Widget container , int newItemSelected){
-                    setState(() {
-                      _container = container;
-                      itemSalected = newItemSelected;
-                    });
-                  },
-
-                  updateTitle: (String title){
-                    setState(() {
-                      _title = title;
-                    });
-                  },
-                ),
+              bottom: 5,
+              right: 20,
+              left: 20,
+              child: DashboardMenu( // Retirez le Container fixe autour
+                itemSalected : itemSalected,
+                updateContainer: (Widget container , int newItemSelected){
+                  setState(() {
+                    _container = container;
+                    itemSalected = newItemSelected;
+                  });
+                },
+                updateTitle: (String title){
+                  setState(() {
+                    _title = title;
+                  });
+                },
               ),
             ),
 

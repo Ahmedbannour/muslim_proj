@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:hive/hive.dart';
 import 'package:muslim_proj/Constants.dart';
@@ -79,34 +80,42 @@ class _MenuWidgetState extends State<MenuWidget> {
                 childAspectRatio: 0.8
             ),
             itemBuilder: (context , index){
-              return Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  SvgPicture.asset(
-                    'assets/icons/${items[index]['icon']}.svg',
-                    color: Color(0xFF864A15),
-                    fit: BoxFit.contain,
-                    height: 24,
-                    alignment: Alignment.center,
-                    clipBehavior: Clip.antiAliasWithSaveLayer,
-                  ),
-
-                  Padding(
-                    padding: const EdgeInsets.all(8.0),
-                    child: FittedBox(
+              return GestureDetector(
+                onTap: (){
+                  Fluttertoast.showToast(
+                    msg: "la fenetre ${items[index]['name']} est en construction",
+                    backgroundColor: KPrimaryColor.withOpacity(.7)
+                  );
+                },
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    SvgPicture.asset(
+                      'assets/icons/${items[index]['icon']}.svg',
+                      color: Color(0xFF864A15),
                       fit: BoxFit.contain,
-                      child: Text(
-                        items[index]['name'],
-                        style: GoogleFonts.beVietnamPro(
-                            fontWeight: FontWeight.w600
-                        ),
-                        textAlign: TextAlign.center,
-                        overflow: TextOverflow.ellipsis,
-                        maxLines: 1,
-                      ),
+                      height: 24,
+                      alignment: Alignment.center,
+                      clipBehavior: Clip.antiAliasWithSaveLayer,
                     ),
-                  )
-                ],
+
+                    Padding(
+                      padding: const EdgeInsets.all(8.0),
+                      child: FittedBox(
+                        fit: BoxFit.contain,
+                        child: Text(
+                          items[index]['name'],
+                          style: GoogleFonts.beVietnamPro(
+                              fontWeight: FontWeight.w600
+                          ),
+                          textAlign: TextAlign.center,
+                          overflow: TextOverflow.ellipsis,
+                          maxLines: 1,
+                        ),
+                      ),
+                    )
+                  ],
+                ),
               );
             },
 

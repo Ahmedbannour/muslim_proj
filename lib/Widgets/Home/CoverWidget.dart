@@ -5,6 +5,8 @@ import 'package:flutter_svg/flutter_svg.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:muslim_proj/Constants.dart';
 import 'package:intl/intl.dart';
+import 'package:muslim_proj/Services/PrayersInfo.dart';
+import 'package:provider/provider.dart';
 
 
 
@@ -19,6 +21,7 @@ class _CoverWidgetState extends State<CoverWidget> {
 
   late Timer _timer; // pour la mise à jour automatique
   DateTime _currentTime = DateTime.now();
+
 
   @override
   void initState() {
@@ -37,6 +40,13 @@ class _CoverWidgetState extends State<CoverWidget> {
     _timer.cancel(); // toujours annuler le timer quand le widget se détruit
     super.dispose();
   }
+
+  @override
+  void didUpdateWidget(covariant CoverWidget oldWidget) {
+    // TODO: implement didUpdateWidget
+    super.didUpdateWidget(oldWidget);
+  }
+
 
   @override
   Widget build(BuildContext context) {
@@ -134,91 +144,113 @@ class _CoverWidgetState extends State<CoverWidget> {
           bottom: 0,
           right: 0,
           left: 0,
-          child: Container(
-            height: 60,
-            decoration: BoxDecoration(
-                gradient: LinearGradient(
-                    colors: [
-                      Color(0xFFFCE5C1), // orange (centre)
-                      KBackgroundColor, // jaune clair vers blanc (extérieur)
-                    ],
-                    begin: Alignment.topCenter,
-                    end: Alignment.bottomCenter
-                )
-            ),
+          child: Consumer<PrayersInfoService>(
+              builder: (_, service, __) {
+                final next = service.nextPrayer;
 
-            child: Row(
-              crossAxisAlignment: CrossAxisAlignment.center,
-              children: [
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.end,
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Container(
-                        child: Text(
-                          "REMAINING TIME",
-                          style: GoogleFonts.beVietnamPro(
-                            fontWeight: FontWeight.w500,
-                            fontSize: 12
-                          )
-                        ),
-                      ),
+                if (next == null) {
+                  return Container(
+                    height: 60,
+                    decoration: BoxDecoration(
+                        gradient: LinearGradient(
+                            colors: [
+                              Color(0xFFFCE5C1), // orange (centre)
+                              KBackgroundColor, // jaune clair vers blanc (extérieur)
+                            ],
+                            begin: Alignment.topCenter,
+                            end: Alignment.bottomCenter
+                        )
+                    ),
+                  );
+                }
 
-
-                      Container(
-                        child: Text(
-                            "Maghrib 0:53:30",
-                            style: GoogleFonts.beVietnamPro(
-                                fontWeight: FontWeight.w600
-                            )
-                        ),
-                      ),
-                    ],
-                  ),
+                return Container(
+                height: 60,
+                decoration: BoxDecoration(
+                    gradient: LinearGradient(
+                        colors: [
+                          Color(0xFFFCE5C1), // orange (centre)
+                          KBackgroundColor, // jaune clair vers blanc (extérieur)
+                        ],
+                        begin: Alignment.topCenter,
+                        end: Alignment.bottomCenter
+                    )
                 ),
 
-                Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 8.0),
-                  child: Container(
-                    width: 4,
-                    height: 40,
-                    alignment: Alignment.center,
-                    decoration: BoxDecoration(
-                        color: Color(0xffdd8508).withOpacity(.2),
-                        borderRadius: BorderRadius.circular(8)
+                child: Row(
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: [
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.end,
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Container(
+                            child: Text(
+                              "REMAINING TIME",
+                              style: GoogleFonts.beVietnamPro(
+                                fontWeight: FontWeight.w500,
+                                fontSize: 12
+                              )
+                            ),
+                          ),
+
+
+                          Container(
+                            child: Text(
+                                "${next['label'].toString()}-${formatDuration(next['remaining'])}" ,
+                                style: GoogleFonts.beVietnamPro(
+                                    fontWeight: FontWeight.w600
+                                )
+                            ),
+                          ),
+                        ],
+                      ),
                     ),
 
-                  ),
-                ),
-
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Text(
-                          getDate(),
-                          style: GoogleFonts.beVietnamPro(
-                              fontWeight: FontWeight.w500,
-                              fontSize: 12
-                          )
-                      ),
-
-
-                      Container(
-                        child: Text(
-                            "Monastir , Tunisia",
-                            style: GoogleFonts.beVietnamPro(
-                              fontWeight: FontWeight.w600
-                            )
+                    Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 8.0),
+                      child: Container(
+                        width: 4,
+                        height: 40,
+                        alignment: Alignment.center,
+                        decoration: BoxDecoration(
+                            color: Color(0xffdd8508).withOpacity(.2),
+                            borderRadius: BorderRadius.circular(8)
                         ),
+
                       ),
-                    ],
-                  ),
+                    ),
+
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Text(
+                              getDate(),
+                              style: GoogleFonts.beVietnamPro(
+                                  fontWeight: FontWeight.w500,
+                                  fontSize: 12
+                              )
+                          ),
+
+
+                          Container(
+                            child: Text(
+                                "Monastir , Tunisia",
+                                style: GoogleFonts.beVietnamPro(
+                                  fontWeight: FontWeight.w600
+                                )
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
                 ),
-              ],
-            ),
+              );
+            }
           ),
         ),
 
@@ -227,6 +259,12 @@ class _CoverWidgetState extends State<CoverWidget> {
     );
   }
 
+  String formatDuration(Duration d) {
+    final h = d.inHours.toString().padLeft(2, '0');
+    final m = (d.inMinutes % 60).toString().padLeft(2, '0');
+    final s = (d.inSeconds % 60).toString().padLeft(2, '0');
+    return "$h:$m:$s";
+  }
 
   String getHours() => _currentTime.hour.toString().padLeft(2, '0');
 

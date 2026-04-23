@@ -68,6 +68,8 @@ class _PrayerWidgetState extends State<PrayerWidget> {
                       }else if(prayersForDate.isNotEmpty){
                         List<Map<dynamic,dynamic>> oldData = prayersForDate.where((elem) => (elem['label'] == "Fajr" || elem['label'] == "Dhuhr" || elem['label'] == "Asr" || elem['label'] == "Maghrib" || elem['label'] == "Isha")).toList();
                         print('oldData task : ${oldData.toString()}');
+
+
                         return ListView.builder(
                           itemCount: oldData.length,
                           scrollDirection: Axis.horizontal,
@@ -130,6 +132,7 @@ class _PrayerWidgetState extends State<PrayerWidget> {
 
                       List<Map<dynamic,dynamic>> res = response.data.where((elem) => (elem['label'] == "Fajr" || elem['label'] == "Dhuhr" || elem['label'] == "Asr" || elem['label'] == "Maghrib" || elem['label'] == "Isha")).toList();
                       print('data task : ${res.toString()}');
+
                       return ListView.builder(
                           itemCount: res.length,
                           scrollDirection: Axis.horizontal,
@@ -225,6 +228,8 @@ class _PrayerWidgetState extends State<PrayerWidget> {
         )
     );
   }
+
+
 
 
   Future<List<Map<dynamic,dynamic>>>  getPrayersInfo() async{

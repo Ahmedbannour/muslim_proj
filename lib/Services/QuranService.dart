@@ -181,12 +181,22 @@ class QuranService extends ChangeNotifier {
         Map<dynamic, dynamic> oldDetails = Map<dynamic, dynamic>.from(box.get('surah_details') ?? {});
 
 
+        if(oldDetails != null){
+          return {
+            "error" : 1 ,
+            "message" : "probleme d api",
+            "data" : oldDetails[surah["englishName"]]
+          };
+        }else{
+          return {
+            "error" : 1 ,
+            "message" : "probleme d api",
+            "data" : {
+              "error" : "not found"
+            }
+          };
+        }
 
-        return {
-          "error" : 1 ,
-          "message" : "probleme d api",
-          "data" : oldDetails[surah["englishName"]]
-        };
 
       }else if (error.response?.statusCode == 403) {
         print('40333333333333333333333333333333333333333333333333333333333333333333');

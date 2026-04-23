@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
@@ -10,7 +11,10 @@ import 'package:muslim_proj/Services/NotifsService.dart';
 class PrayersInfoService extends ChangeNotifier {
   var box = Hive.box('muslim_proj');
 
-  /// Télécharge les prières pour les 7 prochains jours à partir de [today]
+  Map<String,dynamic>? nextPrayer;
+  Timer? _timer;
+
+
   Future<List<Map<dynamic, dynamic>>> downloadPrayerForWeek(DateTime today, LatLng location) async {
 
     List<Map<dynamic , dynamic>> todayPrayers = [];
@@ -22,6 +26,8 @@ class PrayersInfoService extends ChangeNotifier {
 
       if(i == 0){
         todayPrayers = await getPrayerByDate(formatted, location);
+        updateNextPrayer(); // update next prayer
+
       }else{
         // Télécharge les prières pour cette date
         await getPrayerByDate(formatted, location);
@@ -104,6 +110,61 @@ class PrayersInfoService extends ChangeNotifier {
       ];
     }
   }
+
+  void _startCountdown() {
+    _timer?.cancel();
+
+    _timer = Timer.periodic(const Duration(seconds: 1), (_) {
+      if (nextPrayer == null) return;
+
+      final DateTime dt = nextPrayer!["dateTime"];
+      final diff = dt.difference(DateTime.now());
+
+      if (diff.isNegative) {
+        updateNextPrayer(); // passe à la prière suivante
+        return;
+      }
+
+      nextPrayer = {
+        ...nextPrayer!,
+        "remaining": diff,
+      };
+
+      notifyListeners();
+    });
+  }
+
+
+  void updateNextPrayer() {
+    _timer?.cancel();
+
+    final now = DateTime.now();
+    final todayKey = DateFormat('dd-MM-yyyy').format(now);
+
+    final prayersByDate = Map<dynamic, dynamic>.from(box.get('prayersListsByDate') ?? {});
+
+    if (!prayersByDate.containsKey(todayKey)) return;
+
+    final List<Map<dynamic, dynamic>> prayersToday = List<Map<dynamic, dynamic>>.from(prayersByDate[todayKey].where((elem) => (elem['label'] == "Fajr" || elem['label'] == "Dhuhr" || elem['label'] == "Asr" || elem['label'] == "Maghrib" || elem['label'] == "Isha")).toList());
+
+    for (final prayer in prayersToday) {
+      final prayerTime =
+      prayerDateTime(todayKey, prayer['time'].toString());
+
+      if (prayerTime.isAfter(now)) {
+        nextPrayer = {
+          ...prayer,
+          "dateTime": prayerTime,
+          "remaining": prayerTime.difference(now),
+        };
+
+        _startCountdown();
+        notifyListeners();
+        return;
+      }
+    }
+  }
+
 
 
   Future<void> schedulePrayerNotifications(Map<String, String> timings , String date) async {
