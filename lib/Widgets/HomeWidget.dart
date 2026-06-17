@@ -1,8 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_svg/flutter_svg.dart';
-import 'package:google_fonts/google_fonts.dart';
-import 'package:muslim_proj/Constants.dart';
-import 'package:intl/intl.dart';
 import 'package:muslim_proj/Widgets/Home/CoverWidget.dart';
 import 'package:muslim_proj/Widgets/Home/MenuWidget.dart';
 import 'package:muslim_proj/Widgets/Home/PrayerWidget.dart';

@@ -6,7 +6,6 @@ import 'package:muslim_proj/Widgets/CalendarWidget.dart';
 import 'package:muslim_proj/Widgets/HomeWidget.dart';
 import 'package:muslim_proj/Widgets/QiblaWidget.dart';
 import 'package:muslim_proj/Widgets/QuranWidget.dart';
-import 'dart:math' as math;
 
 
 

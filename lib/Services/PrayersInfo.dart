@@ -1,5 +1,4 @@
 import 'dart:async';
-import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:hive/hive.dart';
@@ -91,7 +90,7 @@ class PrayersInfoService extends ChangeNotifier {
           "message" : "probleme de connexion"
         }
       ];
-    } on DioError catch (error) {
+    } on DioException catch (error) {
       // En cas d'erreur réseau, on retourne les données existantes dans Hive
 
       return [

@@ -4,13 +4,9 @@ import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_multi_select_items/flutter_multi_select_items.dart';
 import 'package:flutter_svg/flutter_svg.dart';
-import 'package:geocoding/geocoding.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:google_maps_flutter/google_maps_flutter.dart';
-import 'package:intl/intl.dart';
 import 'package:muslim_proj/Constants.dart';
 import 'package:muslim_proj/Widgets/AddParticipantWidget.dart';
-import 'package:muslim_proj/Widgets/Calendar/MapSelectionScreen.dart';
 import 'package:muslim_proj/Widgets/TaskDetails/DateTimeInput.dart';
 
 
@@ -392,7 +388,7 @@ class _TaskDetailsState extends State<TaskDetails> {
                               ),
 
                             ),
-                            initialValue: task['label'] ?? null,
+                            initialValue: task['label'],
                             onChanged: (value){
                               setState(() {
                                 task['label'] = value;
@@ -548,7 +544,7 @@ class _TaskDetailsState extends State<TaskDetails> {
 
                           SizedBox(height: 4),
 
-                          Container(
+                          SizedBox(
                             height: 60,
                             child: ListView.builder(
                               itemCount: users.length+1,
@@ -980,7 +976,7 @@ class _TaskDetailsState extends State<TaskDetails> {
                                 filled: true,
                                 fillColor: Colors.white
                             ),
-                            initialValue: task['label'] ?? null,
+                            initialValue: task['label'],
                             onChanged: (value){
                               setState(() {
                                 task['label'] = value;

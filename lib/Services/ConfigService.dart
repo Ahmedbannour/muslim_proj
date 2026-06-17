@@ -1,10 +1,8 @@
 import 'dart:io';
 
 import 'package:flutter/material.dart';
-import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:muslim_proj/Services/dio.dart';
 import 'package:dio/dio.dart';
-import 'package:intl/intl.dart';
 
 
 class ConfigService extends ChangeNotifier {
@@ -32,10 +30,10 @@ class ConfigService extends ChangeNotifier {
       var res = response.data;
 
       notifyListeners();
-      print('res : ${res}');
+      print('res : $res');
       return res;
-    } on DioError catch (error) {
-      if (error.type == DioErrorType && error.error is HandshakeException) {
+    } on DioException catch (error) {
+      if (error.type == DioExceptionType && error.error is HandshakeException) {
         // Handle HandshakeException here
 
 
@@ -48,7 +46,7 @@ class ConfigService extends ChangeNotifier {
 
           return [];
         }
-      }else if (error.type == DioErrorType.receiveTimeout || error.error is SocketException) {
+      }else if (error.type == DioExceptionType.receiveTimeout || error.error is SocketException) {
         // Handle the timeout error here
 
 
@@ -92,10 +90,10 @@ class ConfigService extends ChangeNotifier {
       var res = response.data;
 
       notifyListeners();
-      print('res : ${res}');
+      print('res : $res');
       return res;
-    } on DioError catch (error) {
-      if (error.type == DioErrorType && error.error is HandshakeException) {
+    } on DioException catch (error) {
+      if (error.type == DioExceptionType && error.error is HandshakeException) {
         // Handle HandshakeException here
 
 
@@ -108,7 +106,7 @@ class ConfigService extends ChangeNotifier {
 
           return [];
         }
-      }else if (error.type == DioErrorType.receiveTimeout || error.error is SocketException) {
+      }else if (error.type == DioExceptionType.receiveTimeout || error.error is SocketException) {
         // Handle the timeout error here
 
 
@@ -152,10 +150,10 @@ class ConfigService extends ChangeNotifier {
       var res = response.data;
 
       notifyListeners();
-      print('res : ${res}');
+      print('res : $res');
       return res;
-    } on DioError catch (error) {
-      if (error.type == DioErrorType && error.error is HandshakeException) {
+    } on DioException catch (error) {
+      if (error.type == DioExceptionType && error.error is HandshakeException) {
         // Handle HandshakeException here
 
 
@@ -168,7 +166,7 @@ class ConfigService extends ChangeNotifier {
 
           return [];
         }
-      }else if (error.type == DioErrorType.receiveTimeout || error.error is SocketException) {
+      }else if (error.type == DioExceptionType.receiveTimeout || error.error is SocketException) {
         // Handle the timeout error here
 
 

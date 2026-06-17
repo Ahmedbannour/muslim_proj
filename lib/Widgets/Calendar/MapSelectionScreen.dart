@@ -103,16 +103,14 @@ class _MapSelectionScreenState extends State<MapSelectionScreen> {
 
 
 
-                if (position != null && position is LatLng) {
-                  // 🔍 Convertir les coordonnées en adresse
-                  List<Placemark> placemarks = await placemarkFromCoordinates(
-                    position.latitude,
-                    position.longitude,
-                  );
+                // 🔍 Convertir les coordonnées en adresse
+                List<Placemark> placemarks = await placemarkFromCoordinates(
+                  position.latitude,
+                  position.longitude,
+                );
 
-                  print("location : ${placemarks.first.locality ?? ''}, ${placemarks.first.country ?? ''}");
-                }
-              },
+                print("location : ${placemarks.first.locality ?? ''}, ${placemarks.first.country ?? ''}");
+                            },
               markers: _selectedPosition == null ? {} : {
                 Marker(
                   markerId: const MarkerId('selected'),

@@ -2,10 +2,8 @@ import 'dart:io';
 
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
-import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:hive/hive.dart';
 import 'package:muslim_proj/Services/dio.dart';
-import 'package:intl/intl.dart';
 import 'package:path_provider/path_provider.dart';
 
 class QuranService extends ChangeNotifier {
@@ -26,7 +24,7 @@ class QuranService extends ChangeNotifier {
       }
 
       return [];
-    } on DioError catch (error) {
+    } on DioException catch (error) {
       // Lecture sécurisée depuis Hive si erreur réseau
       return [
         {
@@ -59,8 +57,8 @@ class QuranService extends ChangeNotifier {
 
       return [];
 
-    } on DioError catch (error) {
-      if (error.type == DioErrorType && error.error is HandshakeException) {
+    } on DioException catch (error) {
+      if (error.type == DioExceptionType && error.error is HandshakeException) {
         // Handle HandshakeException here
 
         List<Map<dynamic,dynamic>> oldQuranList = box.get('quranList') ?? [];
@@ -87,7 +85,7 @@ class QuranService extends ChangeNotifier {
             }
           ];
         }
-      }else if (error.type == DioErrorType.receiveTimeout || error.error is SocketException) {
+      }else if (error.type == DioExceptionType.receiveTimeout || error.error is SocketException) {
         // Handle the timeout error here
 
         List<Map<dynamic,dynamic>> oldQuranList = box.get('quranList') ?? [];
@@ -140,8 +138,8 @@ class QuranService extends ChangeNotifier {
         "message" : "probleme d api"
       };
 
-    } on DioError catch (error) {
-      if (error.type == DioErrorType && error.error is HandshakeException) {
+    } on DioException catch (error) {
+      if (error.type == DioExceptionType && error.error is HandshakeException) {
         // Handle HandshakeException here
 
 
@@ -173,7 +171,7 @@ class QuranService extends ChangeNotifier {
           };
 
         }
-      }else if (error.type == DioErrorType.receiveTimeout || error.error is SocketException) {
+      }else if (error.type == DioExceptionType.receiveTimeout || error.error is SocketException) {
         // Handle the timeout error here
 
         print('3333');
@@ -181,22 +179,12 @@ class QuranService extends ChangeNotifier {
         Map<dynamic, dynamic> oldDetails = Map<dynamic, dynamic>.from(box.get('surah_details') ?? {});
 
 
-        if(oldDetails != null){
-          return {
-            "error" : 1 ,
-            "message" : "probleme d api",
-            "data" : oldDetails[surah["englishName"]]
-          };
-        }else{
-          return {
-            "error" : 1 ,
-            "message" : "probleme d api",
-            "data" : {
-              "error" : "not found"
-            }
-          };
-        }
-
+        return {
+          "error" : 1 ,
+          "message" : "probleme d api",
+          "data" : oldDetails[surah["englishName"]]
+        };
+      
 
       }else if (error.response?.statusCode == 403) {
         print('40333333333333333333333333333333333333333333333333333333333333333333');
@@ -237,8 +225,8 @@ class QuranService extends ChangeNotifier {
         "message" : "probleme d api"
       };
 
-    }on DioError catch (error) {
-      if (error.type == DioErrorType && error.error is HandshakeException) {
+    }on DioException catch (error) {
+      if (error.type == DioExceptionType && error.error is HandshakeException) {
         // Handle HandshakeException here
 
 
@@ -259,7 +247,7 @@ class QuranService extends ChangeNotifier {
           };
 
         }
-      }else if (error.type == DioErrorType.receiveTimeout || error.error is SocketException) {
+      }else if (error.type == DioExceptionType.receiveTimeout || error.error is SocketException) {
         // Handle the timeout error here
 
 
@@ -316,8 +304,8 @@ class QuranService extends ChangeNotifier {
         "message" : "probleme d api"
       };
 
-    } on DioError catch (error) {
-      if (error.type == DioErrorType && error.error is HandshakeException) {
+    } on DioException catch (error) {
+      if (error.type == DioExceptionType && error.error is HandshakeException) {
         // Handle HandshakeException here
 
 
@@ -338,7 +326,7 @@ class QuranService extends ChangeNotifier {
           };
 
         }
-      }else if (error.type == DioErrorType.receiveTimeout || error.error is SocketException) {
+      }else if (error.type == DioExceptionType.receiveTimeout || error.error is SocketException) {
         // Handle the timeout error here
 
 
@@ -387,8 +375,8 @@ class QuranService extends ChangeNotifier {
         "message" : "probleme d api ayah"
       };
 
-    } on DioError catch (error) {
-      if (error.type == DioErrorType && error.error is HandshakeException) {
+    } on DioException catch (error) {
+      if (error.type == DioExceptionType && error.error is HandshakeException) {
         // Handle HandshakeException here
 
 
@@ -409,7 +397,7 @@ class QuranService extends ChangeNotifier {
           };
 
         }
-      }else if (error.type == DioErrorType.receiveTimeout || error.error is SocketException) {
+      }else if (error.type == DioExceptionType.receiveTimeout || error.error is SocketException) {
         // Handle the timeout error here
 
 

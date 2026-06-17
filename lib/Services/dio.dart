@@ -1,6 +1,4 @@
 import 'package:dio/dio.dart';
-import 'package:muslim_proj/Constants.dart';
-import 'package:hive/hive.dart';
 
 Dio dio(){
 
@@ -20,7 +18,7 @@ Dio dio(){
       // Do something with the response data
       return handler.next(response); // continue with the response
     },
-    onError: (DioError e, ErrorInterceptorHandler handler) {
+    onError: (DioException e, ErrorInterceptorHandler handler) {
       // Handle errors
       return handler.next(e);
     },

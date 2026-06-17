@@ -220,10 +220,11 @@ class _HorsLigneConfigState extends State<HorsLigneConfig> {
                                 itemBuilder: (context, index) {
                                   final isSelected = selectedIndexes.contains(index+1);
 
-                                  if(index == quranList.length)
+                                  if(index == quranList.length) {
                                     return Container(
                                       height: 60,
                                     );
+                                  }
                                   return AnimatedContainer(
                                     duration: const Duration(milliseconds: 200),
                                     margin: const EdgeInsets.symmetric(vertical: 4),

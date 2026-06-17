@@ -7,9 +7,7 @@ import 'package:hive/hive.dart';
 import 'package:just_audio/just_audio.dart';
 import 'package:muslim_proj/Constants.dart';
 import 'package:muslim_proj/Services/ConfigService.dart';
-import 'package:muslim_proj/Services/NotifsService.dart';
 import 'package:muslim_proj/Widgets/Configuration/AdhanConfiguration.dart';
-import 'package:muslim_proj/Widgets/Configuration/AdhanItem.dart';
 import 'package:muslim_proj/Widgets/HorsLigneConfig.dart';
 import 'package:provider/provider.dart';
 import 'package:shimmer/shimmer.dart';
@@ -26,9 +24,9 @@ class _ConfigWidgetState extends State<ConfigWidget> {
 
 
 
-  late Future<List<Map<String, dynamic>>> _getTafsirList = getTafsirList();
-  late Future<List<Map<String, dynamic>>> _getTajweedAyahList = getTajweedAyahList();
-  late List<Map<String, dynamic>> _getTajweedSurahList= [
+  late final Future<List<Map<String, dynamic>>> _getTafsirList = getTafsirList();
+  late final Future<List<Map<String, dynamic>>> _getTajweedAyahList = getTajweedAyahList();
+  late final List<Map<String, dynamic>> _getTajweedSurahList= [
     {
       "identifier": "ar.alafasy",
       "language": "ar",

@@ -33,7 +33,7 @@ class _MushafWidgetState extends State<MushafWidget> {
   var box = Hive.box('muslim_proj');
 
   String? tajweedSurahId;
-  bool _isAutoScrolling = false;
+  final bool _isAutoScrolling = false;
 
 
   final ScrollController _controller = ScrollController();
@@ -126,7 +126,9 @@ class _MushafWidgetState extends State<MushafWidget> {
 
   // Nettoyage helpers
   void _clearRecognizers() {
-    for (final r in _tapRecognizers) r.dispose();
+    for (final r in _tapRecognizers) {
+      r.dispose();
+    }
     _tapRecognizers.clear();
   }
 
