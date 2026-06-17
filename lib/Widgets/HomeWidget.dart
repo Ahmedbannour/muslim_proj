@@ -35,7 +35,9 @@ class _HomeWidgetState extends State<HomeWidget> {
 
         Expanded(
           child: PrayerWidget(),
-        )
+        ),
+
+        SizedBox(height: 70)
       ],
     );
   }

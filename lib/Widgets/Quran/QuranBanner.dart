@@ -16,6 +16,7 @@ class _QuranBannerState extends State<QuranBanner> {
   Widget build(BuildContext context) {
     return AnimatedContainer(
       duration: Duration(milliseconds: 200),
+      height: 160,
       decoration: BoxDecoration(
         color: Colors.red,
         borderRadius: BorderRadius.circular(16)

@@ -812,7 +812,7 @@ class _HijriCalendarWidgetState extends State<HijriCalendarWidget> {
     }
 
     return ListView(
-      padding: const EdgeInsets.fromLTRB(12, 14, 12, 12),
+      padding: const EdgeInsets.fromLTRB(12, 14, 12, 70),
       children: [
         for (final task in system)
           TaskCard(
@@ -821,8 +821,7 @@ class _HijriCalendarWidgetState extends State<HijriCalendarWidget> {
             isPast: isPrayerPassed(task, _selectedDay),
             onAdhkarTap: () {
               final isMorning = task.id.contains('morning');
-              Navigator.push(context,
-                  MaterialPageRoute(builder: (_) => AdhkarPage(isMorning: isMorning)));
+              Navigator.push(context, MaterialPageRoute(builder: (_) => AdhkarPage(isMorning: isMorning)));
             },
           ),
 

@@ -4,6 +4,7 @@ import 'dart:io';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/scheduler.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -24,7 +25,7 @@ class MushafWidget extends StatefulWidget {
   State<MushafWidget> createState() => _MushafWidgetState();
 }
 
-class _MushafWidgetState extends State<MushafWidget> {
+class _MushafWidgetState extends State<MushafWidget> with SingleTickerProviderStateMixin {
   late Map<dynamic, dynamic> surah;
   late int surahNumber;
   late Future<Map<dynamic, dynamic>> _getSurahDetails;
@@ -33,58 +34,103 @@ class _MushafWidgetState extends State<MushafWidget> {
   var box = Hive.box('muslim_proj');
 
   String? tajweedSurahId;
-  final bool _isAutoScrolling = false;
 
+  late int scrollValue;
+  late bool autoScrollEnabled;
 
-  final ScrollController _controller = ScrollController();
+  final ScrollController _controller = ScrollController(
+    keepScrollOffset: true,
+  );
 
-  Timer? _autoScrollTimer;
+  // ---- Auto-scroll (Ticker based, fluide et indépendant du framerate) ----
+  // Un seul Ticker créé une fois pour toute la durée de vie du widget.
+  // On ne le dispose JAMAIS pour le recréer : on le stop/start uniquement.
+  // C'est ce qui évite le blocage après un changement de vitesse.
+  Ticker? _autoScrollTicker;
   Timer? _resumeTimer;
+  Duration _lastElapsed = Duration.zero;
 
+  // true tant qu'au moins un doigt touche la zone de lecture.
+  // Mis à jour uniquement via les pointer events bruts (Listener),
+  // donc totalement insensible aux jumpTo() programmatiques.
+  bool _userTouching = false;
+
+  // true pendant les 2s de grâce après que l'utilisateur a relâché,
+  // pour laisser le temps de finir de lire avant que ça reparte.
   bool _userScrolling = false;
-  late double _speed;
 
+  late double _speed; // pixels PAR SECONDE
 
-  void _startAutoScroll() {
-    _autoScrollTimer?.cancel();
+  void _ensureTickerCreated() {
+    // Le Ticker est créé une seule fois. Les appels suivants ne font rien.
+    _autoScrollTicker ??= createTicker((elapsed) {
+      if (!_controller.hasClients) return;
 
-    _autoScrollTimer = Timer.periodic(
-      const Duration(milliseconds: 16),
-          (timer) {
-        if (!_controller.hasClients) return;
-        if (_userScrolling) return;
+      if (_userTouching || _userScrolling || !autoScrollEnabled) {
+        // on resynchronise l'horloge pour ne pas "rattraper" le temps de
+        // pause d'un coup quand l'utilisateur relâche / a fini de lire /
+        // réactive l'auto-scroll après l'avoir mis sur OFF.
+        _lastElapsed = elapsed;
+        return;
+      }
 
-        final maxScroll = _controller.position.maxScrollExtent;
-        final current = _controller.offset;
+      final maxScroll = _controller.position.maxScrollExtent;
+      final current = _controller.offset;
 
-        if (current >= maxScroll) {
-          timer.cancel();
-        } else {
-          _controller.jumpTo(current + _speed);
-        }
-      },
-    );
+      if (current >= maxScroll) {
+        return; // on ne stop pas le ticker, juste rien à faire de plus
+      }
+
+      final double dtSeconds = (elapsed - _lastElapsed).inMicroseconds / 1e6;
+      _lastElapsed = elapsed;
+
+      // sécurité : si dtSeconds est anormalement grand (reprise après pause
+      // longue / hot reload), on l'ignore pour éviter un saut brutal.
+      if (dtSeconds <= 0 || dtSeconds > 0.5) return;
+
+      final double next = (current + _speed * dtSeconds).clamp(0.0, maxScroll);
+      _controller.jumpTo(next);
+    });
   }
 
-  void _onUserScroll() {
+  void _startAutoScroll() {
+    _ensureTickerCreated();
+    _lastElapsed = Duration.zero;
+    if (!_autoScrollTicker!.isTicking) {
+      _autoScrollTicker!.start();
+    }
+  }
+
+  // Appelé par les pointer events bruts : fiable à 100%, ne peut jamais
+  // être confondu avec le jumpTo() de l'auto-scroll puisqu'il ne dépend
+  // d'aucune notification de scroll.
+  void _onPointerDown() {
+    _userTouching = true;
+    _resumeTimer?.cancel();
+  }
+
+  void _onPointerUp() {
+    _userTouching = false;
     _userScrolling = true;
 
     _resumeTimer?.cancel();
-    _resumeTimer = Timer(const Duration(seconds: 2), () {
-      _userScrolling = false;
+    _resumeTimer = Timer(const Duration(milliseconds: 800), () {
+      if (mounted) {
+        _userScrolling = false;
+      }
     });
   }
 
   double getScrollSpeed(int level) {
     switch (level) {
       case 1:
-        return 0.5;
+        return 12; // lent — confortable pour lire chaque mot
       case 2:
-        return 1.2;
+        return 28; // normal
       case 3:
-        return 2.5;
+        return 55; // rapide
       default:
-        return 0.5;
+        return 12;
     }
   }
 
@@ -93,11 +139,13 @@ class _MushafWidgetState extends State<MushafWidget> {
     super.initState();
     surah = widget.surah;
     surahNumber = widget.surahNumber;
-    _getSurahDetails = getSurahDetails(surahNumber , surah);
+    _getSurahDetails = getSurahDetails(surahNumber, surah);
     tajweedSurahId = box.get("tajweedSurahId");
     // _getSurahAudio = getSurahAudio(surahNumber);
 
-    int scrollValue = box.get('scrollValue', defaultValue: 1);
+    scrollValue = box.get('scrollValue', defaultValue: 1);
+    autoScrollEnabled = box.get('autoScroll', defaultValue: true);
+
     _speed = getScrollSpeed(scrollValue);
 
     WidgetsBinding.instance.addPostFrameCallback((_) {
@@ -118,7 +166,8 @@ class _MushafWidgetState extends State<MushafWidget> {
       r.dispose();
     }
     _tapRecognizers.clear();
-    _autoScrollTimer?.cancel();
+    _autoScrollTicker?.stop();
+    _autoScrollTicker?.dispose();
     _resumeTimer?.cancel();
     _controller.dispose();
     super.dispose();
@@ -134,7 +183,10 @@ class _MushafWidgetState extends State<MushafWidget> {
 
   String _cleanUnicodeArabic(String input) {
     // keep Arabic letters, tashkeel and a few Quranic signs, spaces
-    return input.replaceAll(RegExp(r'[^\u0600-\u06FF\u0750-\u077F\u08A0-\u08FF\uFB50-\uFDFF\uFE70-\uFEFF\sًٌٍَُِّْۖۚۛۗ]'), '').trim();
+    return input.replaceAll(
+        RegExp(
+            r'[^\u0600-\u06FF\u0750-\u077F\u08A0-\u08FF\uFB50-\uFDFF\uFE70-\uFEFF\sًٌٍَُِّْۖۚۛۗ]'),
+        '').trim();
   }
 
   String _toArabicIndic(int number) {
@@ -165,23 +217,29 @@ class _MushafWidgetState extends State<MushafWidget> {
       ),
       builder: (context) {
         return ConstrainedBox(
-            constraints:  BoxConstraints(
+            constraints: BoxConstraints(
               maxHeight: (3 / 4) * MediaQuery.of(context).size.height,
             ),
-            child: AyahDetails(oldContext: ctx,surah: surah , ayahNum: ayahNum , text: text,toArabicIndic: _toArabicIndic,)
-        );
-
+            child: AyahDetails(
+              oldContext: ctx,
+              surah: surah,
+              ayahNum: ayahNum,
+              text: text,
+              toArabicIndic: _toArabicIndic,
+            ));
       },
     );
   }
 
-  Future<Map<String, dynamic>> getSurahDetails(int surahNumber , Map<dynamic,dynamic> surah) async {
-    return await Provider.of<QuranService>(context, listen: false).getSurahDetails(surahNumber , surah);
+  Future<Map<String, dynamic>> getSurahDetails(
+      int surahNumber, Map<dynamic, dynamic> surah) async {
+    return await Provider.of<QuranService>(context, listen: false)
+        .getSurahDetails(surahNumber, surah);
   }
 
-
   Future<File> getSurahAudio(int surahNumber) async {
-    return await Provider.of<QuranService>(context, listen: false).getSurahAudio(surahNumber);
+    return await Provider.of<QuranService>(context, listen: false)
+        .getSurahAudio(surahNumber);
   }
 
   @override
@@ -225,91 +283,98 @@ class _MushafWidgetState extends State<MushafWidget> {
         title: Text(
           "Quran",
           style: GoogleFonts.beVietnamPro(
-              color: Colors.black,
-              fontWeight: FontWeight.bold
-          ),
+              color: Colors.black, fontWeight: FontWeight.bold),
         ),
         actions: <Widget>[
           Container(
             margin: const EdgeInsets.only(right: 12),
-            decoration: BoxDecoration(shape: BoxShape.circle, color: KPrimaryColor.withOpacity(0.05)),
+            decoration: BoxDecoration(
+                shape: BoxShape.circle, color: KPrimaryColor.withOpacity(0.05)),
             child: IconButton(
-              icon: const Icon(
-                  Icons.swipe_vertical_outlined,
-                  color: KPrimaryColor
-              ),
+              icon: const Icon(Icons.swipe_vertical_outlined, color: KPrimaryColor),
               onPressed: () {
                 showDialog(
                     context: context,
                     barrierColor: KPrimaryColor.withOpacity(0.2),
-                    builder: (BuildContext context) =>
-                        AlertDialog(
-                            titlePadding: EdgeInsets.all(0),
-                            surfaceTintColor: KBackgroundColor.withOpacity(0.2),
-                            backgroundColor: KBackgroundColor,
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(16.0),
-                            ),
-                            title: Container(
-                              decoration: BoxDecoration(
-                                  color: KPrimaryColor,
-                                  borderRadius: BorderRadius.only(
-                                      topRight: Radius.circular(16),
-                                      topLeft: Radius.circular(16)
-                                  )
-                              ),
-                              child: Padding(
-                                padding: EdgeInsets.all(16),
-                                child: Row(
-                                  mainAxisAlignment: MainAxisAlignment.center,
-                                  crossAxisAlignment: CrossAxisAlignment.end,
-                                  children: [
-
-                                    Icon(
-                                      Icons.swipe_vertical_outlined,
-                                      color: KBackgroundColor,
-                                    ),
-
-                                    SizedBox(
-                                      width: 8,
-                                    ),
-
-                                    Expanded(
-                                      child: Text(
-                                        'Confirmation',
-                                        style: GoogleFonts.beVietnamPro(
-                                          fontWeight: FontWeight.w600,
-                                          color: Colors.white,
-                                          fontSize: 22
-                                        ),
-                                        textAlign: TextAlign.center,
-                                      ),
-                                    ),
-
-                                    SizedBox(width: 8),
-
-                                    GestureDetector(
-                                      onTap: (){
-                                        Navigator.pop(context);
-                                      },
-                                      child: Icon(
-                                        Icons.close,
-                                        color: KBackgroundColor,
-                                      ),
-                                    )
-                                  ],
+                    builder: (BuildContext context) => AlertDialog(
+                        titlePadding: EdgeInsets.all(0),
+                        surfaceTintColor: KBackgroundColor.withOpacity(0.2),
+                        backgroundColor: KBackgroundColor,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(16.0),
+                        ),
+                        title: Container(
+                          decoration: BoxDecoration(
+                              color: KPrimaryColor,
+                              borderRadius: BorderRadius.only(
+                                  topRight: Radius.circular(16),
+                                  topLeft: Radius.circular(16))),
+                          child: Padding(
+                            padding: EdgeInsets.all(16),
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              crossAxisAlignment: CrossAxisAlignment.end,
+                              children: [
+                                Icon(
+                                  Icons.swipe_vertical_outlined,
+                                  color: KBackgroundColor,
                                 ),
-                              ),
+                                SizedBox(
+                                  width: 8,
+                                ),
+                                Expanded(
+                                  child: Text(
+                                    'Confirmation',
+                                    style: GoogleFonts.beVietnamPro(
+                                        fontWeight: FontWeight.w600,
+                                        color: Colors.white,
+                                        fontSize: 22),
+                                    textAlign: TextAlign.center,
+                                  ),
+                                ),
+                                SizedBox(width: 8),
+                                GestureDetector(
+                                  onTap: () {
+                                    Navigator.pop(context);
+                                  },
+                                  child: Icon(
+                                    Icons.close,
+                                    color: KBackgroundColor,
+                                  ),
+                                )
+                              ],
                             ),
-                            content: ScrollConfig()
-                        )
-                );
+                          ),
+                        ),
+                        content: ScrollConfig(
+                          updateScrollValue: (int newScrollValue) {
+                            setState(() {
+                              scrollValue = newScrollValue;
+                              _speed = getScrollSpeed(scrollValue);
+                              // Pas besoin de relancer le ticker : il tourne
+                              // en continu et lit _speed à chaque frame.
+                              // Changer _speed suffit, le mouvement s'ajuste
+                              // tout seul sans aucune coupure.
+                            });
+
+                            print('newScrollValue : $scrollValue');
+                          },
+                          onAutoScrollToggled: (bool enabled) {
+                            setState(() {
+                              autoScrollEnabled = enabled;
+                              // Le ticker tourne déjà en continu ; il se
+                              // contente d'ignorer les frames quand
+                              // autoScrollEnabled est false (voir le check
+                              // dans _ensureTickerCreated). Rien d'autre à
+                              // faire ici, pas de risque de blocage.
+                            });
+                          },
+                        )));
               },
             ),
           )
         ],
       ),
-
       body: SafeArea(
         child: FutureBuilder<Map<dynamic, dynamic>>(
           future: _getSurahDetails,
@@ -319,30 +384,32 @@ class _MushafWidgetState extends State<MushafWidget> {
             } else if (!snapshot.hasData) {
               return const Center(child: CircularProgressIndicator());
             }
-        
+
             final quran = snapshot.data!;
 
             bool isConnected = true;
 
-            if(quran['error'] != null && quran['error'].toString() == "1"){
+            if (quran['error'] != null && quran['error'].toString() == "1") {
               isConnected = false;
             }
 
             print('_getSurahDetails : $quran');
 
-
-            if (quran['data']  != null){
+            if (quran['data'] != null) {
               final surahDetails = quran['data'] as Map<dynamic, dynamic>;
 
               final List<dynamic> ayahsRaw = surahDetails['ayahs'] as List<dynamic>;
 
               // cleaning basmallah & invalid chars
-              final String basmallah = "بِسْمِ اللَّهِ الرَّحْمَٰنِ الرَّحِيمِ";
-              final String firstRaw = ayahsRaw.isNotEmpty ? ayahsRaw[0]['text'].toString() : '';
+              final String basmallah = "بِسْمِ اللَّهِ الرَّحْمَٰنِ الرَّحِيمِ";
+              final String firstRaw =
+              ayahsRaw.isNotEmpty ? ayahsRaw[0]['text'].toString() : '';
               final String cleanedFirstRaw = _cleanUnicodeArabic(firstRaw);
               final bool hasBasmallah = cleanedFirstRaw.startsWith(basmallah);
               final String onlyBasmallah = hasBasmallah ? basmallah : '';
-              final String cleanedFirstAyah = hasBasmallah ? cleanedFirstRaw.replaceFirst(basmallah, '').trim() : cleanedFirstRaw;
+              final String cleanedFirstAyah = hasBasmallah
+                  ? cleanedFirstRaw.replaceFirst(basmallah, '').trim()
+                  : cleanedFirstRaw;
 
               // clear previous recognizers to avoid leaks / duplicates
               _clearRecognizers();
@@ -352,7 +419,9 @@ class _MushafWidgetState extends State<MushafWidget> {
 
               for (int i = 0; i < ayahsRaw.length; i++) {
                 final Map<dynamic, dynamic> ay = ayahsRaw[i] as Map<dynamic, dynamic>;
-                final int ayahNum = ay['numberInSurah'] is int ? ay['numberInSurah'] as int : int.parse(ay['numberInSurah'].toString());
+                final int ayahNum = ay['numberInSurah'] is int
+                    ? ay['numberInSurah'] as int
+                    : int.parse(ay['numberInSurah'].toString());
                 // pick text, clean invalid chars
                 final String rawText = (i == 0 ? cleanedFirstAyah : ay['text'].toString());
                 final String text = _cleanUnicodeArabic(rawText);
@@ -361,15 +430,14 @@ class _MushafWidgetState extends State<MushafWidget> {
                 final recognizer = TapGestureRecognizer()
                   ..onTap = () {
                     // open bottom sheet with ayah
-                    if(isConnected){
+                    if (isConnected) {
                       _showAyahSheet(context, ayahNum, text);
-                    }else{
+                    } else {
                       Fluttertoast.showToast(
                         msg: 'ce service indisponible dans le mode hors ligne :/',
                         toastLength: Toast.LENGTH_LONG,
                       );
                     }
-
                   };
                 _tapRecognizers.add(recognizer);
 
@@ -425,88 +493,72 @@ class _MushafWidgetState extends State<MushafWidget> {
                     right: 0,
                     left: 0,
                     bottom: 80,
-                    child: NotificationListener<ScrollNotification>(
-                      onNotification: (notification) {
-                        if (notification is UserScrollNotification ||
-                            notification is ScrollUpdateNotification) {
-                          _onUserScroll();
-                        }
-                        return false;
-                      },
+                    child: Listener(
+                      onPointerDown: (_) => _onPointerDown(),
+                      onPointerUp: (_) => _onPointerUp(),
+                      onPointerCancel: (_) => _onPointerUp(),
                       child: ListView(
                         controller: _controller,
                         padding: const EdgeInsets.all(16),
                         children: [
                           // header card
-                          GestureDetector(
-                            onTap: (){
-                              print('auto scroll : ${box.get('scrollValue')}');
-                              _startAutoScroll();
-                            },
-                            child: AnimatedContainer(
-                              duration: const Duration(milliseconds: 200),
-                              decoration: BoxDecoration(color: KPrimaryColor.withOpacity(.05), borderRadius: BorderRadius.circular(16)),
-                              padding: const EdgeInsets.all(24),
-                              child: Column(
-                                children: [
-                                  const SizedBox(height: 8),
-                                  Text(
-                                    surah['englishName'] ?? '',
-                                    style: GoogleFonts.beVietnamPro(fontWeight: FontWeight.bold, fontSize: 28, color: KPrimaryColor),
-                                  ),
-                                  const SizedBox(height: 8),
-                                  Row(
-                                    mainAxisAlignment: MainAxisAlignment.center,
-                                    children: [
-
-                                      Text(
-                                        surah['englishNameTranslation'],
-                                        style: GoogleFonts.beVietnamPro(
-                                            color: Colors.black45,
-                                            fontWeight: FontWeight.w400
-                                        ),
-                                      ),
-
-                                      SizedBox(width: 8),
-
-                                      Container(
-                                        height: 6,
-                                        width: 6,
-                                        decoration: BoxDecoration(
-                                            color: Color(0xf736000000),
-                                            shape: BoxShape.circle
-                                        ),
-                                      ),
-
-
-                                      SizedBox(width: 8),
-                                      Text(
-                                        "${surah['numberOfAyahs']} Ayahs",
-                                        style: GoogleFonts.beVietnamPro(
-                                            color: Colors.black45,
-                                            fontWeight: FontWeight.w400
-                                        ),
-                                      )
-                                    ],
-                                  ),
-
-                                  const SizedBox(height: 12),
-                                  if (onlyBasmallah.isNotEmpty)
-                                    Padding(
-                                      padding: const EdgeInsets.symmetric(vertical: 8.0),
-                                      child: Text(
-                                        onlyBasmallah,
-                                        textDirection: TextDirection.rtl,
-                                        style: TextStyle(
-                                            fontFamily: 'HafsNastaleeq_Ver10',
-                                            fontSize: baseFont * 1.4,
-                                            fontWeight: FontWeight.bold,
-                                            color: KPrimaryColor
-                                        ),
-                                      ),
+                          AnimatedContainer(
+                            duration: const Duration(milliseconds: 200),
+                            decoration: BoxDecoration(
+                                color: KPrimaryColor.withOpacity(.05),
+                                borderRadius: BorderRadius.circular(16)),
+                            padding: const EdgeInsets.all(24),
+                            child: Column(
+                              children: [
+                                const SizedBox(height: 8),
+                                Text(
+                                  surah['englishName'] ?? '',
+                                  style: GoogleFonts.beVietnamPro(
+                                      fontWeight: FontWeight.bold,
+                                      fontSize: 28,
+                                      color: KPrimaryColor),
+                                ),
+                                const SizedBox(height: 8),
+                                Row(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  children: [
+                                    Text(
+                                      surah['englishNameTranslation'],
+                                      style: GoogleFonts.beVietnamPro(
+                                          color: Colors.black45,
+                                          fontWeight: FontWeight.w400),
                                     ),
-                                ],
-                              ),
+                                    SizedBox(width: 8),
+                                    Container(
+                                      height: 6,
+                                      width: 6,
+                                      decoration: BoxDecoration(
+                                          color: Color(0xf736000000), shape: BoxShape.circle),
+                                    ),
+                                    SizedBox(width: 8),
+                                    Text(
+                                      "${surah['numberOfAyahs']} Ayahs",
+                                      style: GoogleFonts.beVietnamPro(
+                                          color: Colors.black45,
+                                          fontWeight: FontWeight.w400),
+                                    )
+                                  ],
+                                ),
+                                const SizedBox(height: 12),
+                                if (onlyBasmallah.isNotEmpty)
+                                  Padding(
+                                    padding: const EdgeInsets.symmetric(vertical: 8.0),
+                                    child: Text(
+                                      onlyBasmallah,
+                                      textDirection: TextDirection.rtl,
+                                      style: TextStyle(
+                                          fontFamily: 'HafsNastaleeq_Ver10',
+                                          fontSize: baseFont * 1.4,
+                                          fontWeight: FontWeight.bold,
+                                          color: KPrimaryColor),
+                                    ),
+                                  ),
+                              ],
                             ),
                           ),
 
@@ -531,11 +583,15 @@ class _MushafWidgetState extends State<MushafWidget> {
                     bottom: 0,
                     right: 0,
                     left: 0,
-                    child: isConnected == true ? AudioReader(url: "https://cdn.islamic.network/quran/audio-surah/128/${tajweedSurahId ?? "ar.alafasy"}/$surahNumber.mp3") : Row(
+                    child: isConnected == true
+                        ? AudioReader(
+                        url:
+                        "https://cdn.islamic.network/quran/audio-surah/128/${tajweedSurahId ?? "ar.alafasy"}/$surahNumber.mp3")
+                        : Row(
                       children: [
                         Expanded(
                           child: GestureDetector(
-                            onTap: (){
+                            onTap: () {
                               Navigator.pop(context);
                             },
                             child: Padding(
@@ -544,8 +600,7 @@ class _MushafWidgetState extends State<MushafWidget> {
                                 duration: Duration(milliseconds: 200),
                                 decoration: BoxDecoration(
                                     color: KPrimaryColor,
-                                    borderRadius: BorderRadius.circular(8)
-                                ),
+                                    borderRadius: BorderRadius.circular(8)),
                                 child: Padding(
                                   padding: const EdgeInsets.all(8.0),
                                   child: Center(
@@ -555,8 +610,7 @@ class _MushafWidgetState extends State<MushafWidget> {
                                           fontFamily: 'UthmanicHafs',
                                           fontWeight: FontWeight.bold,
                                           color: Colors.white,
-                                          fontSize: 26
-                                      ),
+                                          fontSize: 26),
                                     ),
                                   ),
                                 ),
@@ -569,36 +623,18 @@ class _MushafWidgetState extends State<MushafWidget> {
                   )
                 ],
               );
-            }else{
+            } else {
               return Container(
                 child: Center(
-                  child: Text(
-                    "data not found"
-                  ),
+                  child: Text("data not found"),
                 ),
               );
             }
-
           },
         ),
       ),
     );
   }
-  Duration durationFromScrollValue(int value) {
-    switch (value) {
-      case 1: // lent
-        return const Duration(milliseconds: 40);
-      case 2: // normal
-        return const Duration(milliseconds: 25);
-      case 3: // rapide
-        return const Duration(milliseconds: 12);
-      default:
-        return const Duration(milliseconds: 25);
-    }
-  }
-
-
 }
 
 enum ScrollSpeed { slow, normal, fast }
-

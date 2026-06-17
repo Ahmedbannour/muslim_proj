@@ -21,10 +21,8 @@ class _QuranWidgetState extends State<QuranWidget> {
         children: [
           const SizedBox(height: 32),
 
-          Expanded(
-            flex : 1,
-            child: QuranBanner(),
-          ),
+          QuranBanner(),
+
 
           SizedBox(height: 16),
 
@@ -32,6 +30,8 @@ class _QuranWidgetState extends State<QuranWidget> {
             flex: 3,
             child: QuranContent(filterQuranType: 1)
           ),
+
+          SizedBox(height: 54)
 
         ],
       ),

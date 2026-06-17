@@ -75,18 +75,25 @@ class _DashboardMenuState extends State<DashboardMenu> {
       duration: Duration(milliseconds: 200),
       height: 70, // Un peu plus haut pour le confort
       decoration: BoxDecoration(
-        color: currentPage == DashboardItems.Home ? KPrimaryColor.withOpacity(0.1) : KPrimaryColor.withOpacity(.1), // Fond blanc pur
+        color: KBackgroundColor, // Fond blanc pur
         borderRadius: BorderRadius.circular(30), // Bords très arrondis
-       
       ),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceAround,
-        children: [
-          menuItem(1, 'Home', _itemSelected == 1 ? "house-blank (2)" : "house-blank (1)"),
-          menuItem(2, 'Quran', _itemSelected == 2 ? "quran-user (1)" : "quran-user"),
-          menuItem(3, 'Qibla', _itemSelected == 3 ? "compass-alt (1)" : "compass-alt"),
-          menuItem(4, 'Calendar', _itemSelected == 4 ? "calendar-day (3)" : "calendar-day (2)"),
-        ],
+      child: AnimatedContainer(
+        duration: Duration(milliseconds: 200),
+        height: 70, // Un peu plus haut pour le confort
+        decoration: BoxDecoration(
+          color: KPrimaryColor.withOpacity(.1), // Fond blanc pur
+          borderRadius: BorderRadius.circular(30), // Bords très arrondis
+        ),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceAround,
+          children: [
+            menuItem(1, 'Home', _itemSelected == 1 ? "house-blank (2)" : "house-blank (1)"),
+            menuItem(2, 'Quran', _itemSelected == 2 ? "quran-user (1)" : "quran-user"),
+            menuItem(3, 'Qibla', _itemSelected == 3 ? "compass-alt (1)" : "compass-alt"),
+            menuItem(4, 'Calendar', _itemSelected == 4 ? "calendar-day (3)" : "calendar-day (2)"),
+          ],
+        ),
       ),
     );
   }

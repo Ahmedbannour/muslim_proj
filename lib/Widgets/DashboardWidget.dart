@@ -44,7 +44,7 @@ class _DashboardWidgetState extends State<DashboardWidget> {
             Positioned(
               top: 0,
               right: 0,
-              bottom: itemSalected != 4 ? 60 : 80,
+              bottom: 0,
               left: 0,
               child: _container,
             ),
